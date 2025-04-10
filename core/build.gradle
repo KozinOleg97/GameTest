@@ -1,0 +1,29 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+dependencies {
+  api "com.badlogicgames.ashley:ashley:$ashleyVersion"
+  api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.esotericsoftware:kryo:$kryoVersion"
+  api "com.github.tommyettinger:anim8-gdx:$anim8Version"
+  api "com.github.tommyettinger:regexodus:$regExodusVersion"
+  api "com.github.tommyettinger:textratypist:$textratypistVersion"
+  api "com.kotcrab.vis:vis-ui:$visUiVersion"
+  api "com.squidpony:squidlib-extra:$squidlibExtraVersion"
+  api "com.squidpony:squidlib-util:$squidlibUtilVersion"
+  api "com.squidpony:squidlib:$squidlibVersion"
+  api "org.apache.commons:commons-collections4:$commonsCollectionsVersion"
+  api "space.earlygrey:simple-graphs:$simpleGraphsVersion"
+  annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+  compileOnly "org.projectlombok:lombok:$lombokVersion"
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+
+  // Dagger 2:
+  implementation "com.google.dagger:dagger:$dagger2Version"
+  annotationProcessor "com.google.dagger:dagger-compiler:$dagger2Version"
+}
