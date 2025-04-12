@@ -8,15 +8,16 @@ import lombok.Setter;
 
 @Singleton
 public class GameSettings {
-    private Preferences prefs = Gdx.app.getPreferences("game-settings");
+
+    private final Preferences prefs = Gdx.app.getPreferences("game-settings");
 
     @Setter
     @Getter
-    private float speedMultiplier = 100.0f; // Значение по умолчанию
+    private float speedMultiplier; // Значение по умолчанию
 
 
     public GameSettings() {
-        speedMultiplier = prefs.getFloat("speedMultiplier", 100.0f);
+        this.speedMultiplier = prefs.getFloat("speedMultiplier", 100.0f);
     }
 
     public void save() {

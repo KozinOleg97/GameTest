@@ -8,6 +8,7 @@ import io.github.game.ecs.components.PositionComponent;
 import io.github.game.ecs.components.RenderComponent;
 
 public class RenderingSystem extends IteratingSystem {
+
     private final SpriteBatch batch;
 
     public RenderingSystem(SpriteBatch batch) {

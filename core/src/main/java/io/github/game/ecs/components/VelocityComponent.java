@@ -8,7 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VelocityComponent implements Component {
-    public static final ComponentMapper<VelocityComponent> MAPPER = ComponentMapper.getFor(VelocityComponent.class);
+
+    public static final ComponentMapper<VelocityComponent> MAPPER = ComponentMapper.getFor(
+        VelocityComponent.class);
 
     private float velocityX = 0;
     private float velocityY = 0;

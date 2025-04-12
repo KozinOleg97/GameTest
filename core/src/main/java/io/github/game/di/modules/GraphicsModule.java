@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 
 @Module
 public class GraphicsModule {
+
     @Provides
     @Singleton
     SpriteBatch provideSpriteBatch() {

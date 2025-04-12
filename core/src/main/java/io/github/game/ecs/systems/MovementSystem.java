@@ -12,7 +12,8 @@ public class MovementSystem extends IteratingSystem {
 
     @Inject
     public MovementSystem() {
-        super(Family.all(PositionComponent.class).get());            }
+        super(Family.all(PositionComponent.class).get());
+    }
 
     @Override
     public void processEntity(Entity entity, float deltaTime) {

@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 
 @Module
 public class SettingsModule {
+
     @Provides
     @Singleton
     GameSettings provideGameSettings() {

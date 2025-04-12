@@ -1,6 +1,7 @@
 package io.github.game.services;
 
 public class InputService {
+
     private boolean isRightPressed = false;
     private boolean isLeftPressed = false;
     private boolean isUpPressed = false;
@@ -25,10 +26,10 @@ public class InputService {
 
     // Получение значений осей
     public float getHorizontalAxis() {
-        return (float)(isRightPressed ? 1 : 0) + (isLeftPressed ? -1 : 0);
+        return (float) (isRightPressed ? 1 : 0) + (isLeftPressed ? -1 : 0);
     }
 
     public float getVerticalAxis() {
-        return (float)(isUpPressed ? 1 : 0) + (isDownPressed ? -1 : 0);
+        return (float) (isUpPressed ? 1 : 0) + (isDownPressed ? -1 : 0);
     }
 }

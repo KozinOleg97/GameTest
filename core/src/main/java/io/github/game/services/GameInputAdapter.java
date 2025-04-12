@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 
 public class GameInputAdapter extends InputAdapter {
+
     private final InputService inputService;
 
 
@@ -14,7 +15,7 @@ public class GameInputAdapter extends InputAdapter {
 
     @Override
     public boolean keyDown(int keycode) {
-        Gdx.app.log("INPUT","Key pressed: " + keycode);
+        Gdx.app.log("INPUT", "Key pressed: " + keycode);
         switch (keycode) {
             case Keys.RIGHT -> inputService.setRightPressed(true);
             case Keys.LEFT -> inputService.setLeftPressed(true);

@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
-import io.github.game.ecs.components.PlayerComponent;
 import io.github.game.ecs.components.PositionComponent;
 import io.github.game.ecs.components.VelocityComponent;
+import io.github.game.ecs.components.tags.PlayerComponent;
 import java.text.MessageFormat;
 
 public class PlayerMovementSystem extends IteratingSystem {
@@ -14,10 +14,10 @@ public class PlayerMovementSystem extends IteratingSystem {
 
     public PlayerMovementSystem() {
         super(Family.all(
-                PlayerComponent.class,
-                VelocityComponent.class,
-                PositionComponent.class
-            ).get());
+            PlayerComponent.class,
+            VelocityComponent.class,
+            PositionComponent.class
+        ).get());
 
     }
 

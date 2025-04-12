@@ -26,7 +26,7 @@ import javax.inject.Singleton;
     InputModule.class,
     GraphicsModule.class,
     GameScreenModule.class
-    })
+})
 public interface AppComponent {
 
 
@@ -35,11 +35,17 @@ public interface AppComponent {
 
     // Получение зависимостей для ручного использования:
     Lazy<GameScreen> lazyGameScreen();
+
     GameScreen gameScreen();
+
     PooledEngine engine();
+
     EntityFactory entityFactory();
+
     RenderingSystem renderingSystem();
+
     InputService inputService();
+
     GameSettings gameSettings();
 
 }

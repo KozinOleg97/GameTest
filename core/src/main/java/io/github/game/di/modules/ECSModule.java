@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 
 @Module
 public class ECSModule {
+
     @Provides
     @Singleton
     PooledEngine providePooledEngine() {

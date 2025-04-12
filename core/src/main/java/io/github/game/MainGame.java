@@ -14,8 +14,8 @@ import java.text.MessageFormat;
 import javax.inject.Inject;
 
 
-
 public class MainGame extends Game {
+
     @Inject
     ResourceManager resourceManager;
 
@@ -36,22 +36,24 @@ public class MainGame extends Game {
         appComponent = DaggerAppComponent.create();
         appComponent.inject(this);
 
-        // Адаптер использует внедренный сервис
-        GameInputAdapter inputAdapter = new GameInputAdapter(inputService);
-        Gdx.input.setInputProcessor(inputAdapter);
+        // Установка ввода
+        Gdx.input.setInputProcessor(new GameInputAdapter(inputService));
 
         // Загрузка текстур
         resourceManager.loadTextures();
         while (!resourceManager.update()) {
-          Gdx.app.log("ASSETS", MessageFormat.format("loaded {0}%", resourceManager.getProgress() * 100));
+            logAssetsLoadProgress();
         }
-        Gdx.app.log("ASSETS", MessageFormat.format("loaded {0}%", resourceManager.getProgress() * 100));
+        logAssetsLoadProgress();
 
-
-       gameSettings.save();
-
+        gameSettings.save();
 
         setScreen(lazyGameScreen.get()); // Экран создается через Dagger
+    }
+
+    private void logAssetsLoadProgress() {
+        Gdx.app.log("ASSETS",
+            MessageFormat.format("loaded {0}%", resourceManager.getProgress() * 100));
     }
 }
 

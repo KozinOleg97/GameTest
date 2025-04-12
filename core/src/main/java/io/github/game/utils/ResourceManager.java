@@ -9,11 +9,14 @@ import javax.inject.Singleton;
 
 @Singleton
 public class ResourceManager {
+
     private final AssetManager assetManager = new AssetManager();
 
     // Загрузка текстур
+    //TODO: приделать на TextureAtlas
     public void loadTextures() {
         assetManager.load("textures/ball.png", Texture.class);
+        assetManager.load("textures/red_ball.png", Texture.class);
     }
 
     // Получение текстуры
@@ -26,14 +29,16 @@ public class ResourceManager {
         assetManager.finishLoading();
     }
 
-    public boolean update (){
+    public boolean update() {
         return assetManager.update();
     }
 
     public void checkLoadStatus() {
         if (assetManager.isFinished()) {
             Gdx.app.log("ASSETS", "Textures loaded");
-        }else {Gdx.app.log("ASSETS", "Textures NOT loaded");}
+        } else {
+            Gdx.app.log("ASSETS", "Textures NOT loaded");
+        }
     }
 
     public float getProgress() {
