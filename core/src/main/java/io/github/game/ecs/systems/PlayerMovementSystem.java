@@ -1,5 +1,6 @@
 package io.github.game.ecs.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -11,6 +12,10 @@ import java.text.MessageFormat;
 
 public class PlayerMovementSystem extends IteratingSystem {
 
+    private static final ComponentMapper<PositionComponent> POSITION = ComponentMapper.getFor(
+        PositionComponent.class);
+    private final ComponentMapper<VelocityComponent> VELOCITY = ComponentMapper.getFor(
+        VelocityComponent.class);
 
     public PlayerMovementSystem() {
         super(Family.all(
@@ -23,8 +28,8 @@ public class PlayerMovementSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        PositionComponent position = PositionComponent.MAPPER.get(entity);
-        VelocityComponent velocity = VelocityComponent.MAPPER.get(entity);
+        PositionComponent position = POSITION.get(entity);
+        VelocityComponent velocity = VELOCITY.get(entity);
 
         // Обновляем позицию на основе скорости
         position.getCoordinates().x += velocity.getVelocityX() * deltaTime;

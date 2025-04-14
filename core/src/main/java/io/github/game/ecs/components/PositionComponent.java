@@ -2,7 +2,6 @@ package io.github.game.ecs.components;
 
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.math.Vector2;
 import lombok.Getter;
 
@@ -12,8 +11,6 @@ import lombok.Getter;
 @Getter
 public class PositionComponent implements Component {
 
-    public static final ComponentMapper<PositionComponent> MAPPER = ComponentMapper.getFor(
-        PositionComponent.class);
     private final Vector2 coordinates = new Vector2(); // Текущие координаты (x, y)
     private final int z; // Z-уровень (для сортировки слоёв отрисовки)
 

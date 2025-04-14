@@ -29,13 +29,11 @@ public class GameScreen implements Screen {
         this.entityFactory = entityFactory;
         this.npcMovementSystem = npcMovementSystem;
 
-
         // Добавление систем в движок ECS
         engine.addSystem(playerInputSystem);
         engine.addSystem(playerMovementSystem);
         engine.addSystem(renderingSystem);
         engine.addSystem(npcMovementSystem);
-
 
         // Добавление сущностей в движок ECS
         entityFactory.createPlayer(100, 100);

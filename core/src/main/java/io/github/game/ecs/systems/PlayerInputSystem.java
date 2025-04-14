@@ -1,5 +1,6 @@
 package io.github.game.ecs.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -10,6 +11,9 @@ import io.github.game.utils.GameSettings;
 import javax.inject.Inject;
 
 public class PlayerInputSystem extends IteratingSystem {
+
+    private static final ComponentMapper<VelocityComponent> VELOCITY = ComponentMapper.getFor(
+        VelocityComponent.class);
 
     private final InputService inputService;
     private final GameSettings gameSettings;
@@ -26,7 +30,7 @@ public class PlayerInputSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        VelocityComponent velocity = VelocityComponent.MAPPER.get(entity);
+        VelocityComponent velocity = VELOCITY.get(entity);
         velocity.setVelocityX(inputService.getHorizontalAxis() * gameSettings.getSpeedMultiplier());
         velocity.setVelocityY(inputService.getVerticalAxis() * gameSettings.getSpeedMultiplier());
     }
