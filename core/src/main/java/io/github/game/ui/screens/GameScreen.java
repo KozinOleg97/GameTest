@@ -3,9 +3,9 @@ package io.github.game.ui.screens;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Screen;
 import io.github.game.ecs.EntityFactory;
-import io.github.game.ecs.systems.NPCMovementSystem;
+import io.github.game.ecs.systems.MovementSystem;
+import io.github.game.ecs.systems.NPCLogicSystem;
 import io.github.game.ecs.systems.PlayerInputSystem;
-import io.github.game.ecs.systems.PlayerMovementSystem;
 import io.github.game.ecs.systems.RenderingSystem;
 import javax.inject.Inject;
 
@@ -13,27 +13,27 @@ public class GameScreen implements Screen {
 
     private final PooledEngine engine;
     private final PlayerInputSystem playerInputSystem;
-    private final PlayerMovementSystem playerMovementSystem;
+    private final MovementSystem movementSystem;
     private final RenderingSystem renderingSystem;
     private final EntityFactory entityFactory;
-    private final NPCMovementSystem npcMovementSystem;
+    private final NPCLogicSystem npcLogicSystem;
 
     @Inject
     public GameScreen(PooledEngine engine, PlayerInputSystem playerInputSystem,
-                      PlayerMovementSystem playerMovementSystem, RenderingSystem renderingSystem,
-                      EntityFactory entityFactory, NPCMovementSystem npcMovementSystem) {
+                      MovementSystem movementSystem, RenderingSystem renderingSystem,
+                      EntityFactory entityFactory, NPCLogicSystem npcLogicSystem) {
         this.engine = engine;
         this.playerInputSystem = playerInputSystem;
-        this.playerMovementSystem = playerMovementSystem;
+        this.movementSystem = movementSystem;
         this.renderingSystem = renderingSystem;
         this.entityFactory = entityFactory;
-        this.npcMovementSystem = npcMovementSystem;
+        this.npcLogicSystem = npcLogicSystem;
 
         // Добавление систем в движок ECS
         engine.addSystem(playerInputSystem);
-        engine.addSystem(playerMovementSystem);
+        engine.addSystem(movementSystem);
+        engine.addSystem(npcLogicSystem);
         engine.addSystem(renderingSystem);
-        engine.addSystem(npcMovementSystem);
 
         // Добавление сущностей в движок ECS
         entityFactory.createPlayer(100, 100);

@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.PooledEngine;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.ecs.EntityFactory;
-import io.github.game.ecs.systems.NPCMovementSystem;
+import io.github.game.ecs.systems.MovementSystem;
+import io.github.game.ecs.systems.NPCLogicSystem;
 import io.github.game.ecs.systems.PlayerInputSystem;
-import io.github.game.ecs.systems.PlayerMovementSystem;
 import io.github.game.ecs.systems.RenderingSystem;
 import io.github.game.services.InputService;
 import io.github.game.ui.screens.GameScreen;
@@ -21,13 +21,13 @@ public class GameScreenModule {
     GameScreen provideGameScreen(
         PooledEngine engine,
         PlayerInputSystem inputSystem,
-        PlayerMovementSystem movementSystem,
+        MovementSystem movementSystem,
         RenderingSystem renderingSystem,
         EntityFactory entityFactory,
-        NPCMovementSystem npcMovementSystem
+        NPCLogicSystem npcLogicSystem
     ) {
         return new GameScreen(engine, inputSystem, movementSystem, renderingSystem, entityFactory,
-            npcMovementSystem);
+            npcLogicSystem);
     }
 
     @Provides
@@ -39,8 +39,14 @@ public class GameScreenModule {
 
     @Provides
     @Singleton
-    PlayerMovementSystem providePlayerMovementSystem() {
-        return new PlayerMovementSystem();
+    MovementSystem provideMovementSystem() {
+        return new MovementSystem();
+    }
+
+    @Provides
+    @Singleton
+    NPCLogicSystem provideNPCLogicSystem(GameSettings gameSettings) {
+        return new NPCLogicSystem(gameSettings);
     }
 
 

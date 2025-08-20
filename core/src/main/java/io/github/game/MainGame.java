@@ -46,8 +46,6 @@ public class MainGame extends Game {
         }
         logAssetsLoadProgress();
 
-        gameSettings.save();
-
         setScreen(lazyGameScreen.get()); // Экран создается через Dagger
     }
 
