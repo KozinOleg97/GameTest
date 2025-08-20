@@ -13,7 +13,6 @@ public class WorldModule {
     @Singleton
     public HexMap provideHexMap() {
         HexMap map = new HexMap();
-        // Здесь можно добавить базовую генерацию мира
         map.generateRectangularArea(-5, -5, 10, 10, HexType.PLAINS);
         return map;
     }

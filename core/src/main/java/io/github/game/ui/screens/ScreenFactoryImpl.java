@@ -1,0 +1,108 @@
+package io.github.game.ui.screens;
+
+import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import io.github.game.ecs.EntityFactory;
+import io.github.game.services.AssetService;
+import io.github.game.services.WorldInitService;
+import io.github.game.utils.ResourceManager;
+import java.util.Objects;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
+public class ScreenFactoryImpl implements ScreenFactory {
+
+    private final ResourceManager resourceManager;
+    private final SpriteBatch spriteBatch;
+    private final AssetService assetService;
+    private final BitmapFont font;
+    private final ScreenSwitcher screenSwitcher;
+    private final WorldInitService worldInitService;
+    private final EntityFactory entityFactory;
+    private final PooledEngine engine;
+
+    @Inject
+    public ScreenFactoryImpl(ResourceManager resourceManager,
+                             SpriteBatch spriteBatch,
+                             AssetService assetService,
+                             BitmapFont font,
+                             ScreenSwitcher screenSwitcher,
+                             WorldInitService worldInitService,
+                             EntityFactory entityFactory,
+                             PooledEngine engine) {
+        this.resourceManager = resourceManager;
+        this.spriteBatch = spriteBatch;
+        this.assetService = assetService;
+        this.font = font;
+        this.screenSwitcher = screenSwitcher;
+        this.engine = engine;
+        this.worldInitService = worldInitService;
+        this.entityFactory = entityFactory;
+    }
+
+
+    @Override
+    public LoadingScreen createLoadingScreen() {
+        return new LoadingScreen(
+            Objects.requireNonNull(assetService, "AssetService must not be null"),
+            Objects.requireNonNull(spriteBatch, "SpriteBatch must not be null"),
+            Objects.requireNonNull(font, "Font must not be null"),
+            Objects.requireNonNull(screenSwitcher, "ScreenSwitcher must not be null")
+        );
+    }
+
+    @Override
+    public GameScreen createGameScreen() {
+        return new GameScreen(
+            Objects.requireNonNull(engine, "Engine must not be null"),
+            Objects.requireNonNull(entityFactory, "EntityFactory must not be null"),
+            Objects.requireNonNull(worldInitService, "WorldInitService must not be null")
+        );
+    }
+
+    @Override
+    public Screen createBattleScreen() {
+        // Возвращаем заглушку вместо исключения
+        return new Screen() {
+            @Override
+            public void show() {
+            }
+
+            @Override
+            public void render(float delta) {
+                // Простой экран с сообщением
+                Gdx.gl.glClearColor(0, 0, 0, 1);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+                spriteBatch.begin();
+                font.draw(spriteBatch, "Battle Screen - Not Implemented Yet", 100, 100);
+                spriteBatch.end();
+            }
+
+            @Override
+            public void resize(int width, int height) {
+            }
+
+            @Override
+            public void pause() {
+            }
+
+            @Override
+            public void resume() {
+            }
+
+            @Override
+            public void hide() {
+            }
+
+            @Override
+            public void dispose() {
+            }
+        };
+    }
+}

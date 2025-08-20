@@ -1,57 +1,71 @@
 package io.github.game;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import dagger.Lazy;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.game.di.AppComponent;
 import io.github.game.di.DaggerAppComponent;
-import io.github.game.services.GameInputAdapter;
-import io.github.game.services.InputService;
+import io.github.game.di.modules.CoreModule;
 import io.github.game.ui.screens.GameScreen;
-import io.github.game.utils.GameSettings;
-import io.github.game.utils.ResourceManager;
-import java.text.MessageFormat;
+import io.github.game.ui.screens.LoadingScreen;
+import io.github.game.ui.screens.ScreenFactory;
+import io.github.game.ui.screens.ScreenSwitcher;
 import javax.inject.Inject;
 
-
-public class MainGame extends Game {
-
-    @Inject
-    ResourceManager resourceManager;
+public class MainGame extends Game implements ScreenSwitcher {
 
     @Inject
-    InputService inputService;
-
+    ScreenFactory screenFactory;
     @Inject
-    Lazy<GameScreen> lazyGameScreen;
-
-    @Inject
-    GameSettings gameSettings;
+    SpriteBatch spriteBatch;
 
     private AppComponent appComponent;
+    private LoadingScreen loadingScreen;
+    private GameScreen gameScreen;
 
     @Override
     public void create() {
         // Инициализация Dagger
-        appComponent = DaggerAppComponent.create();
+//        appComponent = DaggerAppComponent.create();
+        appComponent = DaggerAppComponent.builder()
+            .coreModule(new CoreModule(this))
+            .build();
         appComponent.inject(this);
 
-        // Установка ввода
-        Gdx.input.setInputProcessor(new GameInputAdapter(inputService));
+        // Создаем экраны через фабрику
+        loadingScreen = screenFactory.createLoadingScreen();
+        // GameScreen создадим позже, после загрузки ресурсов
 
-        // Загрузка текстур
-        resourceManager.loadTextures();
-        while (!resourceManager.update()) {
-            logAssetsLoadProgress();
-        }
-        logAssetsLoadProgress();
-
-        setScreen(lazyGameScreen.get()); // Экран создается через Dagger
+        // Установка экрана загрузки
+        switchToLoadingScreen();
     }
 
-    private void logAssetsLoadProgress() {
-        Gdx.app.log("ASSETS",
-            MessageFormat.format("loaded {0}%", resourceManager.getProgress() * 100));
+    @Override
+    public void switchToGameScreen() {
+        if (gameScreen == null) {
+            gameScreen = screenFactory.createGameScreen();
+        }
+        setScreen(gameScreen);
+    }
+
+    @Override
+    public void switchToLoadingScreen() {
+        setScreen(loadingScreen);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (loadingScreen != null) {
+            loadingScreen.dispose();
+            loadingScreen = null;
+        }
+        if (gameScreen != null) {
+            gameScreen.dispose();
+            gameScreen = null;
+        }
+        if (spriteBatch != null) {
+            spriteBatch.dispose(); // Освобождаем SpriteBatch
+            spriteBatch = null;
+        }
     }
 }
-

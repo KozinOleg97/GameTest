@@ -1,47 +1,89 @@
 package io.github.game.utils;
 
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.TextureLoader;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
-import javax.inject.Singleton;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.Disposable;
 
+/**
+ * Управляет загрузкой и доступом к игровым ресурсам.
+ * Инкапсулирует работу с AssetManager.
+ */
+public class ResourceManager implements Disposable {
 
-@Singleton
-public class ResourceManager {
+    private final AssetManager assetManager;
 
-    private final AssetManager assetManager = new AssetManager();
+    public ResourceManager() {
+        this.assetManager = new AssetManager();
+        this.assetManager.setLoader(Texture.class, new TextureLoader(new InternalFileHandleResolver()));
+    }
 
-    // Загрузка текстур
-    //TODO: приделать на TextureAtlas
+    /**
+     * Загружает все необходимые текстуры игры
+     */
     public void loadTextures() {
+        // TODO: Перейти на использование TextureAtlas
         assetManager.load("textures/ball.png", Texture.class);
         assetManager.load("textures/red_ball.png", Texture.class);
     }
 
-    // Получение текстуры
+    /**
+     * Загружает атлас текстур
+     */
+    public void loadTextureAtlas(String atlasPath) {
+        assetManager.load(atlasPath, TextureAtlas.class);
+    }
+
+    /**
+     * Возвращает текстуру по пути
+     */
     public Texture getTexture(String path) {
         return assetManager.get(path, Texture.class);
     }
 
-    // Обязательно вызывайте assetManager.update() в основном цикле, если загрузка асинхронная.
-    public void finishLoading() {
-        assetManager.finishLoading();
+    /**
+     * Возвращает атлас текстур
+     */
+    public TextureAtlas getTextureAtlas(String atlasPath) {
+        return assetManager.get(atlasPath, TextureAtlas.class);
     }
 
+    /**
+     * Обновляет процесс загрузки ресурсов
+     * @return true если все ресурсы загружены
+     */
     public boolean update() {
         return assetManager.update();
     }
 
-    public void checkLoadStatus() {
-        if (assetManager.isFinished()) {
-            Gdx.app.log("ASSETS", "Textures loaded");
-        } else {
-            Gdx.app.log("ASSETS", "Textures NOT loaded");
-        }
+    /**
+     * Блокирует поток до завершения загрузки всех ресурсов
+     */
+    public void finishLoading() {
+        assetManager.finishLoading();
     }
 
+    /**
+     * Возвращает прогресс загрузки ресурсов
+     */
     public float getProgress() {
         return assetManager.getProgress();
+    }
+
+    /**
+     * Проверяет, завершена ли загрузка всех ресурсов
+     */
+    public boolean isFinished() {
+        return assetManager.isFinished();
+    }
+
+    /**
+     * Освобождает все ресурсы
+     */
+    @Override
+    public void dispose() {
+        assetManager.dispose();
     }
 }

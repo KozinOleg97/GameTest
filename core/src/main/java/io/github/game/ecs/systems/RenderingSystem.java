@@ -41,11 +41,4 @@ public class RenderingSystem extends IteratingSystem {
     super.update(deltaTime);
     batch.end();
   }
-
-  // Метод для освобождения ресурсов
-  public void dispose() {
-    if (batch != null) {
-      batch.dispose(); // Уничтожаем SpriteBatch
-    }
-  }
 }

@@ -4,11 +4,13 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import io.github.game.core.world.hex.Hex;
 import io.github.game.ecs.components.PositionComponent;
 import io.github.game.ecs.components.RenderComponent;
 import io.github.game.ecs.components.VelocityComponent;
 import io.github.game.ecs.components.tags.NPCComponent;
 import io.github.game.ecs.components.tags.PlayerComponent;
+import io.github.game.ecs.components.world.HexComponent;
 import io.github.game.utils.ResourceManager;
 import javax.inject.Inject;
 
@@ -64,5 +66,18 @@ public class EntityFactory {
         npc.add(new RenderComponent(npcSprite));
         engine.addEntity(npc);
         return npc;
+    }
+
+    /**
+     * Создает сущность, представляющую гекс на карте мира
+     *
+     * @param hex данные гекса
+     * @return созданная сущность
+     */
+    public Entity createHexEntity(Hex hex) {
+        Entity entity = new Entity();
+        entity.add(new HexComponent(hex));
+        // Здесь можно добавить другие компоненты, если необходимо
+        return entity;
     }
 }
