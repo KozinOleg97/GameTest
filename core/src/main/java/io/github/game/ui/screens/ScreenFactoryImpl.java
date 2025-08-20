@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.game.ecs.EntityFactory;
+import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.AssetService;
 import io.github.game.services.WorldInitService;
 import io.github.game.utils.ResourceManager;
@@ -25,6 +26,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final WorldInitService worldInitService;
     private final EntityFactory entityFactory;
     private final PooledEngine engine;
+    private final HexMapRenderer hexMapRenderer;
 
     @Inject
     public ScreenFactoryImpl(ResourceManager resourceManager,
@@ -34,7 +36,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              ScreenSwitcher screenSwitcher,
                              WorldInitService worldInitService,
                              EntityFactory entityFactory,
-                             PooledEngine engine) {
+                             PooledEngine engine,
+                             HexMapRenderer hexMapRenderer) {
         this.resourceManager = resourceManager;
         this.spriteBatch = spriteBatch;
         this.assetService = assetService;
@@ -43,6 +46,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
         this.engine = engine;
         this.worldInitService = worldInitService;
         this.entityFactory = entityFactory;
+        this.hexMapRenderer = hexMapRenderer;
     }
 
 
@@ -61,7 +65,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
         return new GameScreen(
             Objects.requireNonNull(engine, "Engine must not be null"),
             Objects.requireNonNull(entityFactory, "EntityFactory must not be null"),
-            Objects.requireNonNull(worldInitService, "WorldInitService must not be null")
+            Objects.requireNonNull(worldInitService, "WorldInitService must not be null"),
+            Objects.requireNonNull(hexMapRenderer, "HexMapRenderer must not be null")
         );
     }
 

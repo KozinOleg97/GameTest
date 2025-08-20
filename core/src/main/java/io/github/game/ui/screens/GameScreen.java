@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import io.github.game.ecs.EntityFactory;
+import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.WorldInitService;
 import javax.inject.Inject;
 
@@ -13,14 +14,17 @@ public class GameScreen implements Screen {
     private final PooledEngine engine;
     private final EntityFactory entityFactory;
     private final WorldInitService worldInitService;
+    private final HexMapRenderer hexMapRenderer;
 
     @Inject
     public GameScreen(PooledEngine engine,
                       EntityFactory entityFactory,
-                      WorldInitService worldInitService) {
+                      WorldInitService worldInitService,
+                      HexMapRenderer hexMapRenderer) {
         this.engine = engine;
         this.entityFactory = entityFactory;
         this.worldInitService = worldInitService;
+        this.hexMapRenderer = hexMapRenderer;
     }
 
     @Override
@@ -39,6 +43,9 @@ public class GameScreen implements Screen {
         // Очистка экрана
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Отрисовка гексовой карты
+        hexMapRenderer.render();
 
         // Обновление систем ECS
         engine.update(delta);
@@ -67,7 +74,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        // Очистка ресурсов
-        // Освобождение ресурсов должно быть делегировано соответствующим системам/сервисам
+        hexMapRenderer.dispose();
     }
 }
