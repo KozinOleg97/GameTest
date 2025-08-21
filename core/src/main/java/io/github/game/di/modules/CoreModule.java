@@ -1,6 +1,5 @@
 package io.github.game.di.modules;
 
-import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -8,8 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.MainGame;
-import io.github.game.core.world.HexMap;
-import io.github.game.core.world.hex.HexType;
 import io.github.game.ui.screens.ScreenSwitcher;
 import io.github.game.utils.GameSettings;
 import io.github.game.utils.ResourceManager;
@@ -23,7 +20,6 @@ public class CoreModule {
     public CoreModule(MainGame game) {
         this.game = game;
     }
-
 
 
     @Provides
@@ -72,11 +68,4 @@ public class CoreModule {
     ResourceManager provideResourceManager() {
         return new ResourceManager();
     }
-
-
-//    @Provides
-//    @Singleton
-//    PooledEngine providePooledEngine() {
-//        return new PooledEngine();
-//    }
 }

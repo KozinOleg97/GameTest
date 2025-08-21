@@ -8,8 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
- * Управляет загрузкой и доступом к игровым ресурсам.
- * Инкапсулирует работу с AssetManager.
+ * Управляет загрузкой и доступом к игровым ресурсам. Инкапсулирует работу с AssetManager.
  */
 public class ResourceManager implements Disposable {
 
@@ -17,7 +16,8 @@ public class ResourceManager implements Disposable {
 
     public ResourceManager() {
         this.assetManager = new AssetManager();
-        this.assetManager.setLoader(Texture.class, new TextureLoader(new InternalFileHandleResolver()));
+        this.assetManager.setLoader(Texture.class,
+            new TextureLoader(new InternalFileHandleResolver()));
     }
 
     /**
@@ -52,6 +52,7 @@ public class ResourceManager implements Disposable {
 
     /**
      * Обновляет процесс загрузки ресурсов
+     *
      * @return true если все ресурсы загружены
      */
     public boolean update() {
