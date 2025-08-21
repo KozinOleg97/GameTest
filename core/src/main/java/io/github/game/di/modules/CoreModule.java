@@ -74,9 +74,9 @@ public class CoreModule {
     }
 
 
-    @Provides
-    @Singleton
-    PooledEngine providePooledEngine() {
-        return new PooledEngine();
-    }
+//    @Provides
+//    @Singleton
+//    PooledEngine providePooledEngine() {
+//        return new PooledEngine();
+//    }
 }

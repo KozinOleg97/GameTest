@@ -6,7 +6,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.game.ecs.EntityFactory;
+import io.github.game.input.InputManager;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.AssetService;
 import io.github.game.services.WorldInitService;
@@ -27,6 +29,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final EntityFactory entityFactory;
     private final PooledEngine engine;
     private final HexMapRenderer hexMapRenderer;
+    private final InputManager inputManager;
+    private final Viewport viewport;
 
     @Inject
     public ScreenFactoryImpl(ResourceManager resourceManager,
@@ -37,7 +41,9 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              WorldInitService worldInitService,
                              EntityFactory entityFactory,
                              PooledEngine engine,
-                             HexMapRenderer hexMapRenderer) {
+                             HexMapRenderer hexMapRenderer,
+                             InputManager inputManager,
+                             Viewport viewport) {
         this.resourceManager = resourceManager;
         this.spriteBatch = spriteBatch;
         this.assetService = assetService;
@@ -47,6 +53,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
         this.worldInitService = worldInitService;
         this.entityFactory = entityFactory;
         this.hexMapRenderer = hexMapRenderer;
+        this.inputManager = inputManager;
+        this.viewport = viewport;
     }
 
 
@@ -66,7 +74,10 @@ public class ScreenFactoryImpl implements ScreenFactory {
             Objects.requireNonNull(engine, "Engine must not be null"),
             Objects.requireNonNull(entityFactory, "EntityFactory must not be null"),
             Objects.requireNonNull(worldInitService, "WorldInitService must not be null"),
-            Objects.requireNonNull(hexMapRenderer, "HexMapRenderer must not be null")
+            Objects.requireNonNull(hexMapRenderer, "HexMapRenderer must not be null"),
+            Objects.requireNonNull(inputManager, "InputManager must not be null"),
+            Objects.requireNonNull(viewport, "Viewport must not be null")
+
         );
     }
 

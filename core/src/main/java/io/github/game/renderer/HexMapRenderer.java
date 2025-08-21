@@ -1,5 +1,6 @@
 package io.github.game.renderer;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import io.github.game.core.world.HexMap;
@@ -18,14 +19,18 @@ public class HexMapRenderer {
     private static final float HEX_HEIGHT = 2 * HEX_SIZE;
     private final HexMap hexMap;
     private final ShapeRenderer shapeRenderer;
+    private final OrthographicCamera camera;
 
     @Inject
-    public HexMapRenderer(HexMap hexMap, ShapeRenderer shapeRenderer) {
+    public HexMapRenderer(HexMap hexMap, ShapeRenderer shapeRenderer, OrthographicCamera camera) {
         this.hexMap = hexMap;
         this.shapeRenderer = shapeRenderer;
+        this.camera = camera;
     }
 
     public void render() {
+        shapeRenderer.setProjectionMatrix(camera.combined);
+
         // Отрисовка заполненных гексов
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 

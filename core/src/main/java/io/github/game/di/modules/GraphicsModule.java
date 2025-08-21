@@ -8,21 +8,27 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.game.core.world.HexMap;
 import io.github.game.renderer.HexMapRenderer;
-import io.github.game.utils.ResourceManager;
 import javax.inject.Singleton;
 
 @Module
 public class GraphicsModule {
+
     @Provides
     @Singleton
     OrthographicCamera provideCamera() {
-        return new OrthographicCamera();
+        OrthographicCamera camera = new OrthographicCamera();
+        // Устанавливаем начальные параметры камеры
+        camera.setToOrtho(false, 800, 480);
+        camera.position.set(400, 240, 0); // Центрируем камеру
+        camera.update(); // Важно: обновляем камеру после изменения параметров
+        return camera;
     }
 
     @Provides
     @Singleton
     Viewport provideViewport(OrthographicCamera camera) {
-        return new FitViewport(800, 480, camera);
+        FitViewport viewport = new FitViewport(800, 480, camera);
+        return viewport;
     }
 
     @Provides
@@ -33,7 +39,8 @@ public class GraphicsModule {
 
     @Provides
     @Singleton
-    HexMapRenderer provideHexMapRenderer(HexMap hexMap, ShapeRenderer shapeRenderer) {
-        return new HexMapRenderer(hexMap, shapeRenderer);
+    HexMapRenderer provideHexMapRenderer(HexMap hexMap, ShapeRenderer shapeRenderer,
+                                         OrthographicCamera camera) {
+        return new HexMapRenderer(hexMap, shapeRenderer, camera);
     }
 }

@@ -5,10 +5,11 @@ import dagger.Component;
 import io.github.game.MainGame;
 import io.github.game.di.modules.CoreModule;
 import io.github.game.di.modules.ECSModule;
+import io.github.game.di.modules.GraphicsModule;
+import io.github.game.di.modules.InputModule;
 import io.github.game.di.modules.ScreenModule;
 import io.github.game.di.modules.ServicesModule;
 import io.github.game.di.modules.WorldModule;
-import io.github.game.di.modules.GraphicsModule;
 import io.github.game.services.AssetService;
 import io.github.game.ui.screens.LoadingScreen;
 import javax.inject.Singleton;
@@ -20,7 +21,8 @@ import javax.inject.Singleton;
     ECSModule.class,
     ScreenModule.class,
     WorldModule.class,
-    GraphicsModule.class
+    GraphicsModule.class,
+    InputModule.class,
 })
 public interface AppComponent {
 
