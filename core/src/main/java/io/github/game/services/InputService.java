@@ -32,13 +32,6 @@ public class InputService {
         return currentMode;
     }
 
-    private void resetInputStates() {
-        isRightPressed = false;
-        isLeftPressed = false;
-        isUpPressed = false;
-        isDownPressed = false;
-    }
-
     // Методы для обновления состояния
     public void setRightPressed(boolean pressed) {
         isRightPressed = pressed;
@@ -63,5 +56,12 @@ public class InputService {
 
     public float getVerticalAxis() {
         return (isUpPressed ? 1 : 0) + (isDownPressed ? -1 : 0);
+    }
+
+    private void resetInputStates() {
+        isRightPressed = false;
+        isLeftPressed = false;
+        isUpPressed = false;
+        isDownPressed = false;
     }
 }

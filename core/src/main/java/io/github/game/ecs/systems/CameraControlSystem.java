@@ -61,37 +61,6 @@ public class CameraControlSystem extends EntitySystem {
     }
 
     /**
-     * Обрабатывает клавиатурный ввод для перемещения камеры. Использует состояние кнопок из
-     * InputService.
-     *
-     * @param deltaTime Время, прошедшее с последнего кадра
-     */
-    private void handleKeyboardInput(float deltaTime) {
-        // Используем настройки из GameSettings
-        float moveAmount = gameSettings.getCameraMoveSpeed() * deltaTime;
-
-        // Движение вправо
-        if (inputService.isRightPressed()) {
-            camera.position.x += moveAmount / camera.zoom;
-        }
-
-        // Движение влево
-        if (inputService.isLeftPressed()) {
-            camera.position.x -= moveAmount / camera.zoom;
-        }
-
-        // Движение вверх
-        if (inputService.isUpPressed()) {
-            camera.position.y += moveAmount / camera.zoom;
-        }
-
-        // Движение вниз
-        if (inputService.isDownPressed()) {
-            camera.position.y -= moveAmount / camera.zoom;
-        }
-    }
-
-    /**
      * Обрабатывает начало касания/нажатия мыши.
      *
      * @param screenX Координата X касания
@@ -162,7 +131,7 @@ public class CameraControlSystem extends EntitySystem {
 
             if (gameSettings.isDebugMode()) {
                 Gdx.app.log("CameraControlSystem",
-                    "Camera position: " + camera.position.x + ", " + camera.position.y);
+                            "Camera position: " + camera.position.x + ", " + camera.position.y);
             }
             return true;
         }
@@ -196,5 +165,36 @@ public class CameraControlSystem extends EntitySystem {
      */
     public OrthographicCamera getCamera() {
         return camera;
+    }
+
+    /**
+     * Обрабатывает клавиатурный ввод для перемещения камеры. Использует состояние кнопок из
+     * InputService.
+     *
+     * @param deltaTime Время, прошедшее с последнего кадра
+     */
+    private void handleKeyboardInput(float deltaTime) {
+        // Используем настройки из GameSettings
+        float moveAmount = gameSettings.getCameraMoveSpeed() * deltaTime;
+
+        // Движение вправо
+        if (inputService.isRightPressed()) {
+            camera.position.x += moveAmount / camera.zoom;
+        }
+
+        // Движение влево
+        if (inputService.isLeftPressed()) {
+            camera.position.x -= moveAmount / camera.zoom;
+        }
+
+        // Движение вверх
+        if (inputService.isUpPressed()) {
+            camera.position.y += moveAmount / camera.zoom;
+        }
+
+        // Движение вниз
+        if (inputService.isDownPressed()) {
+            camera.position.y -= moveAmount / camera.zoom;
+        }
     }
 }

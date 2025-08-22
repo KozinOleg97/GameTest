@@ -28,6 +28,27 @@ public class RenderingSystem extends IteratingSystem {
     }
 
     @Override
+    public void update(float deltaTime) {
+        MemoryUtils.logMemoryUsage("RenderingSystem before update");
+
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        try {
+            super.update(deltaTime);
+        } finally {
+            batch.end();
+        }
+
+        MemoryUtils.logMemoryUsage("RenderingSystem after update");
+
+        // Логируем для отладки
+        if (Gdx.graphics.getFrameId() % 60 == 0) {
+            Gdx.app.debug("RenderingSystem", "Rendered entities: " + getEntities().size());
+        }
+    }
+
+    @Override
     protected void processEntity(Entity entity, float deltaTime) {
         PositionComponent position = positionMapper.get(entity);
         RenderComponent render = renderMapper.get(entity);
@@ -35,7 +56,7 @@ public class RenderingSystem extends IteratingSystem {
         // Проверяем видимость перед рендерингом
         if (isInViewport(position, render)) {
             render.getSprite()
-                .setPosition(position.getCoordinates().x, position.getCoordinates().y);
+                  .setPosition(position.getCoordinates().x, position.getCoordinates().y);
 
             render.getSprite().draw(batch);
         }
@@ -56,9 +77,9 @@ public class RenderingSystem extends IteratingSystem {
         float entityTop = position.getCoordinates().y + spriteHeight;
 
         boolean inViewport = entityRight >= cameraLeft &&
-            entityLeft <= cameraRight &&
-            entityTop >= cameraBottom &&
-            entityBottom <= cameraTop;
+                             entityLeft <= cameraRight &&
+                             entityTop >= cameraBottom &&
+                             entityBottom <= cameraTop;
 
 //        if (Gdx.graphics.getFrameId() % 60 == 0) {
 //            Gdx.app.log("RenderingSystem", "Camera at: (" + camera.position.x + "," + camera.position.y +
@@ -68,26 +89,5 @@ public class RenderingSystem extends IteratingSystem {
 //        }
 
         return inViewport;
-    }
-
-    @Override
-    public void update(float deltaTime) {
-        MemoryUtils.logMemoryUsage("RenderingSystem before update");
-
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        try {
-            super.update(deltaTime);
-        } finally {
-            batch.end();
-        }
-
-        MemoryUtils.logMemoryUsage("RenderingSystem after update");
-
-        // Логируем для отладки
-        if (Gdx.graphics.getFrameId() % 60 == 0) {
-            Gdx.app.debug("RenderingSystem", "Rendered entities: " + getEntities().size());
-        }
     }
 }

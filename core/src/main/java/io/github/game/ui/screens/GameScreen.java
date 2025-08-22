@@ -74,11 +74,6 @@ public class GameScreen implements Screen {
         }
     }
 
-    // Метод для смены режима ввода
-    public void setInputMode(InputMode mode) {
-        inputManager.setInputMode(mode);
-    }
-
     // Остальные методы Screen
     @Override
     public void resize(int width, int height) {
@@ -104,5 +99,10 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         hexMapRenderer.dispose();
+    }
+
+    // Метод для смены режима ввода
+    public void setInputMode(InputMode mode) {
+        inputManager.setInputMode(mode);
     }
 }

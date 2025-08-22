@@ -50,6 +50,10 @@ public class HexMapRenderer {
         shapeRenderer.end();
     }
 
+    public void dispose() {
+        shapeRenderer.dispose();
+    }
+
     private void drawHex(Hex hex) {
         // Выбор цвета в зависимости от типа гекса
         switch (hex.getType()) {
@@ -128,9 +132,5 @@ public class HexMapRenderer {
         float y = hex.getR() * HEX_HEIGHT + yOffset;
 
         return new Vector2(x, y);
-    }
-
-    public void dispose() {
-        shapeRenderer.dispose();
     }
 }

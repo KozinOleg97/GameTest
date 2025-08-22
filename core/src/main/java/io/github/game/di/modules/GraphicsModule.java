@@ -23,7 +23,7 @@ public class GraphicsModule {
         OrthographicCamera camera = new OrthographicCamera();
         // Устанавливаем начальные параметры камеры
         camera.setToOrtho(false, gameSettings.getResolutionWidth(),
-            gameSettings.getResolutionHeight());
+                          gameSettings.getResolutionHeight());
         camera.position.set(
             gameSettings.getResolutionWidth() / 2f,
             gameSettings.getResolutionHeight() / 2f,

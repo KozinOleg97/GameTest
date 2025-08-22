@@ -45,8 +45,8 @@ public class LoadingScreen implements Screen {
         // Отрисовка прогресса загрузки
         spriteBatch.begin();
         font.draw(spriteBatch, "Loading: " + (int) (progress * 100) + "%",
-            Gdx.graphics.getWidth() / 2 - 50,
-            Gdx.graphics.getHeight() / 2);
+                  Gdx.graphics.getWidth() / 2 - 50,
+                  Gdx.graphics.getHeight() / 2);
         spriteBatch.end();
 
         // Если загрузка завершена, переключаемся на главный экран
@@ -80,6 +80,4 @@ public class LoadingScreen implements Screen {
         // Очистка ресурсов, специфичных для этого экрана
         font.dispose();
     }
-
-    // Остальные методы Screen...
 }

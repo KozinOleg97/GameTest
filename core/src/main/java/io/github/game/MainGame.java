@@ -29,10 +29,9 @@ public class MainGame extends Game implements ScreenSwitcher {
     @Override
     public void create() {
         // Инициализация Dagger
-//        appComponent = DaggerAppComponent.create();
         appComponent = DaggerAppComponent.builder()
-            .coreModule(new CoreModule(this))
-            .build();
+                                         .coreModule(new CoreModule(this))
+                                         .build();
         appComponent.inject(this);
 
         // Применяем графические настройки
@@ -44,20 +43,6 @@ public class MainGame extends Game implements ScreenSwitcher {
 
         // Установка экрана загрузки
         switchToLoadingScreen();
-    }
-
-    private void applyGraphicsSettings() {
-        // Применяем настройки графики
-        if (gameSettings.isFullscreen()) {
-            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-        } else {
-            Gdx.graphics.setWindowedMode(
-                gameSettings.getResolutionWidth(),
-                gameSettings.getResolutionHeight()
-            );
-        }
-
-        Gdx.graphics.setVSync(gameSettings.isVsync());
     }
 
     @Override
@@ -73,17 +58,6 @@ public class MainGame extends Game implements ScreenSwitcher {
         setScreen(loadingScreen);
     }
 
-
-    @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
-        // При изменении размера окна можно обновить настройки
-        if (!gameSettings.isFullscreen()) {
-            gameSettings.setResolutionWidth(width);
-            gameSettings.setResolutionHeight(height);
-        }
-    }
-
     @Override
     public void dispose() {
         super.dispose();
@@ -96,11 +70,35 @@ public class MainGame extends Game implements ScreenSwitcher {
             gameScreen = null;
         }
         if (spriteBatch != null) {
-            spriteBatch.dispose(); // Освобождаем SpriteBatch
+            spriteBatch.dispose();
             spriteBatch = null;
         }
 
         // Принудительный вызов сборщика мусора
         System.gc();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        // При изменении размера окна можно обновить настройки
+        if (!gameSettings.isFullscreen()) {
+            gameSettings.setResolutionWidth(width);
+            gameSettings.setResolutionHeight(height);
+        }
+    }
+
+    private void applyGraphicsSettings() {
+        // Применяем настройки графики
+        if (gameSettings.isFullscreen()) {
+            Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+        } else {
+            Gdx.graphics.setWindowedMode(
+                gameSettings.getResolutionWidth(),
+                gameSettings.getResolutionHeight()
+            );
+        }
+
+        Gdx.graphics.setVSync(gameSettings.isVsync());
     }
 }

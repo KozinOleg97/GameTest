@@ -17,7 +17,7 @@ public class ResourceManager implements Disposable {
     public ResourceManager() {
         this.assetManager = new AssetManager();
         this.assetManager.setLoader(Texture.class,
-            new TextureLoader(new InternalFileHandleResolver()));
+                                    new TextureLoader(new InternalFileHandleResolver()));
     }
 
     /**

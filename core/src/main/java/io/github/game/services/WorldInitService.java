@@ -21,19 +21,17 @@ public class WorldInitService {
     private final HexMap hexMap;
     private final EntityFactory entityFactory;
     private boolean initialized = false;
-
+    /**
+     * Инициализирует игровой мир, создавая сущности для всех гексов
+     */
+    private boolean playerCreated = false;
+    private boolean npcsCreated = false;
     @Inject
     public WorldInitService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory) {
         this.engine = engine;
         this.hexMap = hexMap;
         this.entityFactory = entityFactory;
     }
-
-    /**
-     * Инициализирует игровой мир, создавая сущности для всех гексов
-     */
-    private boolean playerCreated = false;
-    private boolean npcsCreated = false;
 
     public void initializeWorld() {
         if (initialized) {

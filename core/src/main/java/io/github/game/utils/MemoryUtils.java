@@ -12,7 +12,7 @@ public class MemoryUtils {
         long maxMemory = runtime.maxMemory() / (1024 * 1024);
 
         Gdx.app.log("Memory", context + " - Used: " + usedMemory + "MB, Free: " + freeMemory +
-            "MB, Total: " + totalMemory + "MB, Max: " + maxMemory + "MB");
+                              "MB, Total: " + totalMemory + "MB, Max: " + maxMemory + "MB");
     }
 
     public static boolean isMemoryCritical() {
