@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 public class InputService {
 
+    // Методы для обновления состояния
     private boolean isRightPressed = false;
     private boolean isLeftPressed = false;
     private boolean isUpPressed = false;
@@ -26,27 +27,6 @@ public class InputService {
         this.currentMode = mode;
         // Сброс состояний при смене режима
         resetInputStates();
-    }
-
-    public InputMode getCurrentMode() {
-        return currentMode;
-    }
-
-    // Методы для обновления состояния
-    public void setRightPressed(boolean pressed) {
-        isRightPressed = pressed;
-    }
-
-    public void setLeftPressed(boolean pressed) {
-        isLeftPressed = pressed;
-    }
-
-    public void setUpPressed(boolean pressed) {
-        isUpPressed = pressed;
-    }
-
-    public void setDownPressed(boolean pressed) {
-        isDownPressed = pressed;
     }
 
     // Получение значений осей

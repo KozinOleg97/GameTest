@@ -24,25 +24,25 @@ public class WorldMapInputProcessor extends InputAdapter {
             return false;
         }
 
-        switch (keycode) {
-            case Input.Keys.W:
-            case Input.Keys.UP:
+        return switch (keycode) {
+            case Input.Keys.W, Input.Keys.UP -> {
                 inputService.setUpPressed(true);
-                return true;
-            case Input.Keys.S:
-            case Input.Keys.DOWN:
+                yield true;
+            }
+            case Input.Keys.S, Input.Keys.DOWN -> {
                 inputService.setDownPressed(true);
-                return true;
-            case Input.Keys.A:
-            case Input.Keys.LEFT:
+                yield true;
+            }
+            case Input.Keys.A, Input.Keys.LEFT -> {
                 inputService.setLeftPressed(true);
-                return true;
-            case Input.Keys.D:
-            case Input.Keys.RIGHT:
+                yield true;
+            }
+            case Input.Keys.D, Input.Keys.RIGHT -> {
                 inputService.setRightPressed(true);
-                return true;
-        }
-        return false;
+                yield true;
+            }
+            default -> false;
+        };
     }
 
     @Override
@@ -51,25 +51,25 @@ public class WorldMapInputProcessor extends InputAdapter {
             return false;
         }
 
-        switch (keycode) {
-            case Input.Keys.W:
-            case Input.Keys.UP:
+        return switch (keycode) {
+            case Input.Keys.W, Input.Keys.UP -> {
                 inputService.setUpPressed(false);
-                return true;
-            case Input.Keys.S:
-            case Input.Keys.DOWN:
+                yield true;
+            }
+            case Input.Keys.S, Input.Keys.DOWN -> {
                 inputService.setDownPressed(false);
-                return true;
-            case Input.Keys.A:
-            case Input.Keys.LEFT:
+                yield true;
+            }
+            case Input.Keys.A, Input.Keys.LEFT -> {
                 inputService.setLeftPressed(false);
-                return true;
-            case Input.Keys.D:
-            case Input.Keys.RIGHT:
+                yield true;
+            }
+            case Input.Keys.D, Input.Keys.RIGHT -> {
                 inputService.setRightPressed(false);
-                return true;
-        }
-        return false;
+                yield true;
+            }
+            default -> false;
+        };
     }
 
     @Override

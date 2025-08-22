@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Getter;
 
 @Singleton
 public class InputManager {
 
     private final InputService inputService;
+    @Getter
     private final InputMultiplexer inputMultiplexer;
     private final Map<InputMode, InputProcessor> processors;
     private InputMode currentMode;
@@ -50,10 +52,6 @@ public class InputManager {
         }
 
         // Можно добавить общие процессоры, которые работают всегда
-    }
-
-    public InputMultiplexer getInputMultiplexer() {
-        return inputMultiplexer;
     }
 
     public InputMode getCurrentMode() {

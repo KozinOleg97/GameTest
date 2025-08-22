@@ -68,8 +68,6 @@ public class GameScreen implements Screen {
 
             if (MemoryUtils.isMemoryCritical()) {
                 Gdx.app.error("Memory", "CRITICAL: Memory is running low!");
-                // Можно предпринять действия по освобождению памяти
-                System.gc();
             }
         }
     }

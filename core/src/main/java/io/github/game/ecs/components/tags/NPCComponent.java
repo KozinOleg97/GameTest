@@ -6,5 +6,6 @@ public class NPCComponent implements Component {
 
 
     public NPCComponent() {
+        // Конструктор для Dagger
     }
 }

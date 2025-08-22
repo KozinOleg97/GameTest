@@ -29,9 +29,8 @@ public class WorldSimulationSystem extends IteratingSystem {
     }
 
     private void simulateHex(Hex hex, float deltaTime) {
-        // Пример простой логики симуляции:
-        // Увеличиваем "возраст" гекса или обновляем его состояние
-        // В реальной реализации здесь будет сложная логика в зависимости от типа гекса
+
+        // Заготовка для логики в зависимости от типа гекса
 
         // Например, для леса можно увеличивать количество древесины:
         if (hex.getType() == HexType.FOREST) {

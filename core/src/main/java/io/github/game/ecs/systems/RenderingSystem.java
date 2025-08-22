@@ -76,18 +76,16 @@ public class RenderingSystem extends IteratingSystem {
         float entityBottom = position.getCoordinates().y;
         float entityTop = position.getCoordinates().y + spriteHeight;
 
-        boolean inViewport = entityRight >= cameraLeft &&
-                             entityLeft <= cameraRight &&
-                             entityTop >= cameraBottom &&
-                             entityBottom <= cameraTop;
-
-//        if (Gdx.graphics.getFrameId() % 60 == 0) {
+        //        if (Gdx.graphics.getFrameId() % 60 == 0) {
 //            Gdx.app.log("RenderingSystem", "Camera at: (" + camera.position.x + "," + camera.position.y +
 //                "), viewport: " + camera.viewportWidth + "x" + camera.viewportHeight + ", zoom: " + camera.zoom);
 //            Gdx.app.log("RenderingSystem", "Entity at: " + position.getCoordinates() +
 //                " is " + (inViewport ? "VISIBLE" : "HIDDEN"));
 //        }
 
-        return inViewport;
+        return entityRight >= cameraLeft &&
+               entityLeft <= cameraRight &&
+               entityTop >= cameraBottom &&
+               entityBottom <= cameraTop;
     }
 }

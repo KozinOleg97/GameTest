@@ -1,7 +1,9 @@
 package io.github.game.utils;
 
 import com.badlogic.gdx.Gdx;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class MemoryUtils {
 
     public static void logMemoryUsage(String context) {
