@@ -85,7 +85,8 @@ public class ECSModule {
     @Provides
     @Singleton
     CameraControlSystem provideCameraControlSystem(OrthographicCamera camera,
-                                                   InputService inputService) {
-        return new CameraControlSystem(camera, inputService);
+                                                   InputService inputService,
+                                                   GameSettings gameSettings) {
+        return new CameraControlSystem(camera, inputService, gameSettings);
     }
 }

@@ -2,6 +2,7 @@ package io.github.game.ecs;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import io.github.game.core.world.hex.Hex;
@@ -13,8 +14,9 @@ import io.github.game.ecs.components.tags.PlayerComponent;
 import io.github.game.ecs.components.world.HexComponent;
 import io.github.game.utils.ResourceManager;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-
+@Singleton
 public class EntityFactory {
 
     private final PooledEngine engine;
@@ -26,58 +28,75 @@ public class EntityFactory {
         this.resourceManager = resourceManager;
     }
 
-    public Entity createPlayer(float x, float y) {
+    public void createPlayer(float x, float y) {
+        Gdx.app.log("EntityFactory", "Creating player at position: " + x + ", " + y);
         Entity player = engine.createEntity();
 
-        // Помечаем как Игрока
-        player.add(new PlayerComponent());
+        // Добавляем компоненты
+        player.add(engine.createComponent(PlayerComponent.class));
 
-        // Позиция
-        player.add(new PositionComponent(x, y));
+        PositionComponent position = engine.createComponent(PositionComponent.class);
+        position.getCoordinates().set(x, y);
+        player.add(position);
 
-        // Скорость
-        player.add(new VelocityComponent());
+        player.add(engine.createComponent(VelocityComponent.class));
 
-        // Спрайт
+        // Создаем и настраиваем спрайт
         Texture playerTexture = resourceManager.getTexture("textures/ball.png");
+        if (playerTexture == null) {
+            throw new RuntimeException("Texture not found: textures/ball.png");
+        }
+
         Sprite playerSprite = new Sprite(playerTexture);
-        player.add(new RenderComponent(playerSprite));
+
+        RenderComponent render = engine.createComponent(RenderComponent.class);
+        render.setSprite(playerSprite);
+        player.add(render);
 
         engine.addEntity(player);
-        return player;
+        Gdx.app.log("EntityFactory", "Player entity created successfully");
     }
 
-
-    public Entity createNPC(float x, float y) {
+    public void createNPC(float x, float y) {
+        Gdx.app.log("EntityFactory", "Creating NPC at position: " + x + ", " + y);
         Entity npc = engine.createEntity();
 
-        // Помечаем как НПС
-        npc.add(new NPCComponent());
+        npc.add(engine.createComponent(NPCComponent.class));
 
-        // Позиция
-        npc.add(new PositionComponent(x, y));
+        PositionComponent position = engine.createComponent(PositionComponent.class);
+        position.getCoordinates().set(x, y);
+        npc.add(position);
 
-        // Скорость
-        npc.add(new VelocityComponent());
+        npc.add(engine.createComponent(VelocityComponent.class));
 
-        // Спрайт
+        // Создаем и настраиваем спрайт
         Texture npcTexture = resourceManager.getTexture("textures/red_ball.png");
+        if (npcTexture == null) {
+            throw new RuntimeException("Texture not found: textures/red_ball.png");
+        }
+
         Sprite npcSprite = new Sprite(npcTexture);
-        npc.add(new RenderComponent(npcSprite));
+
+        RenderComponent render = engine.createComponent(RenderComponent.class);
+        render.setSprite(npcSprite);
+        npc.add(render);
+
         engine.addEntity(npc);
-        return npc;
+        Gdx.app.log("EntityFactory", "NPC entity created successfully");
     }
 
-    /**
-     * Создает сущность, представляющую гекс на карте мира
-     *
-     * @param hex данные гекса
-     * @return созданная сущность
-     */
-    public Entity createHexEntity(Hex hex) {
-        Entity entity = new Entity();
-        entity.add(new HexComponent(hex));
-        // Здесь можно добавить другие компоненты, если необходимо
-        return entity;
+    public void createHexEntity(Hex hex) {
+        Entity entity = engine.createEntity();
+
+        HexComponent hexComp = engine.createComponent(HexComponent.class);
+        hexComp.setHex(hex);
+        entity.add(hexComp);
+
+        engine.addEntity(entity);
+    }
+
+    public void disposeEntity(Entity entity) {
+        // Удаляем сущность из движка
+        engine.removeEntity(entity);
     }
 }

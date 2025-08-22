@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import io.github.game.input.InputMode;
 import io.github.game.services.InputService;
+import io.github.game.utils.GameSettings;
 import javax.inject.Inject;
 
 /**
@@ -17,15 +18,12 @@ public class CameraControlSystem extends EntitySystem {
 
     private final OrthographicCamera camera;
     private final InputService inputService;
+    private final GameSettings gameSettings;
 
     // Векторы для хранения начальных позиций касания и камеры
     private final Vector3 touchStart = new Vector3();
     private final Vector3 cameraStart = new Vector3();
-
-    // Настройки камеры
-    private final float minZoom = 0.5f;
-    private final float maxZoom = 2.0f;
-    private final float moveSpeed = 300.0f;
+    private final Vector3 currentWorldCoords = new Vector3();
 
     // Флаг перетаскивания
     private boolean isDragging = false;
@@ -37,9 +35,12 @@ public class CameraControlSystem extends EntitySystem {
      * @param inputService Сервис ввода для проверки состояния клавиш и режима
      */
     @Inject
-    public CameraControlSystem(OrthographicCamera camera, InputService inputService) {
+    public CameraControlSystem(OrthographicCamera camera,
+                               InputService inputService,
+                               GameSettings gameSettings) {
         this.camera = camera;
         this.inputService = inputService;
+        this.gameSettings = gameSettings;
     }
 
     /**
@@ -66,7 +67,8 @@ public class CameraControlSystem extends EntitySystem {
      * @param deltaTime Время, прошедшее с последнего кадра
      */
     private void handleKeyboardInput(float deltaTime) {
-        float moveAmount = moveSpeed * deltaTime;
+        // Используем настройки из GameSettings
+        float moveAmount = gameSettings.getCameraMoveSpeed() * deltaTime;
 
         // Движение вправо
         if (inputService.isRightPressed()) {
@@ -107,14 +109,16 @@ public class CameraControlSystem extends EntitySystem {
         isDragging = true;
 
         // Конвертируем экранные координаты в мировые
-        Vector3 worldCoords = new Vector3(screenX, screenY, 0);
-        camera.unproject(worldCoords);
+        currentWorldCoords.set(screenX, screenY, 0);
+        camera.unproject(currentWorldCoords);
 
         // Сохраняем начальные позиции
-        touchStart.set(worldCoords.x, worldCoords.y, 0);
+        touchStart.set(currentWorldCoords.x, currentWorldCoords.y, 0);
         cameraStart.set(camera.position);
 
-        Gdx.app.log("CameraControlSystem", "Touch started at: " + touchStart);
+        if (gameSettings.isDebugMode()) {
+            Gdx.app.log("CameraControlSystem", "Touch started at: " + touchStart);
+        }
         return true;
     }
 
@@ -144,25 +148,25 @@ public class CameraControlSystem extends EntitySystem {
      * @return true, если событие обработано
      */
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        // Обрабатываем только в режиме карты мира и при активном перетаскивании
-        if (inputService.getCurrentMode() != InputMode.WORLD_MAP || !isDragging) {
-            return false;
+        if (isDragging && inputService.getCurrentMode() == InputMode.WORLD_MAP) {
+            // Конвертируем экранные координаты в мировые
+            currentWorldCoords.set(screenX, screenY, 0);
+            camera.unproject(currentWorldCoords);
+
+            // Вычисляем смещение в мировых координатах
+            float deltaX = currentWorldCoords.x - touchStart.x;
+            float deltaY = currentWorldCoords.y - touchStart.y;
+
+            // Перемещаем камеру
+            camera.position.set(cameraStart.x - deltaX, cameraStart.y - deltaY, 0);
+
+            if (gameSettings.isDebugMode()) {
+                Gdx.app.log("CameraControlSystem",
+                    "Camera position: " + camera.position.x + ", " + camera.position.y);
+            }
+            return true;
         }
-
-        // Конвертируем экранные координаты в мировые
-        Vector3 currentWorldCoords = new Vector3(screenX, screenY, 0);
-        camera.unproject(currentWorldCoords);
-
-        // Вычисляем смещение в мировых координатах
-        float deltaX = currentWorldCoords.x - touchStart.x;
-        float deltaY = currentWorldCoords.y - touchStart.y;
-
-        // Перемещаем камеру
-        camera.position.set(cameraStart.x - deltaX, cameraStart.y - deltaY, 0);
-
-        Gdx.app.log("CameraControlSystem",
-            "Camera position: " + camera.position.x + ", " + camera.position.y);
-        return true;
+        return false;
     }
 
     /**
@@ -178,9 +182,19 @@ public class CameraControlSystem extends EntitySystem {
             return false;
         }
 
-        // Изменяем зум камеры с ограничениями
-        float newZoom = camera.zoom - amountY * 0.1f;
-        camera.zoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
+        // Используем настройки из GameSettings
+        float newZoom = camera.zoom - amountY * gameSettings.getCameraZoomSensitivity();
+        camera.zoom = Math.max(
+            gameSettings.getCameraMinZoom(),
+            Math.min(gameSettings.getCameraMaxZoom(), newZoom)
+        );
         return true;
+    }
+
+    /**
+     * Возвращает текущую камеру (может быть полезно для других систем)
+     */
+    public OrthographicCamera getCamera() {
+        return camera;
     }
 }

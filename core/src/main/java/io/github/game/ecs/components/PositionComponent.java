@@ -3,36 +3,31 @@ package io.github.game.ecs.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Pool;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Компонент для хранения позиции сущности в 2D-пространстве.
  */
 @Getter
-public class PositionComponent implements Component {
+@Setter
+public class PositionComponent implements Component, Pool.Poolable {
 
     private final Vector2 coordinates = new Vector2(); // Текущие координаты (x, y)
-    private final int z; // Z-уровень (для сортировки слоёв отрисовки)
+    private int z; // Z-уровень (для сортировки слоёв отрисовки)
 
-    /**
-     * Конструктор с начальными координатами.
-     *
-     * @param x Начальная позиция по X.
-     * @param y Начальная позиция по Y.
-     */
-    public PositionComponent(float x, float y) {
-        this(x, y, 0);
+    public PositionComponent() {
     }
 
-    /**
-     * Конструктор с начальными координатами и Z-уровнем.
-     *
-     * @param x Начальная позиция по X.
-     * @param y Начальная позиция по Y.
-     * @param z Z-уровень (например, 0 — земля, 1 — объекты, 2 — небо).
-     */
-    public PositionComponent(float x, float y, int z) {
-        coordinates.set(x, y);
-        this.z = z;
+    public PositionComponent(float x, float y) {
+        this.coordinates.set(x, y);
+    }
+
+
+    @Override
+    public void reset() {
+        coordinates.set(0, 0);
+        z = 0;
     }
 }

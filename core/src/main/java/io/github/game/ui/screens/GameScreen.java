@@ -10,6 +10,7 @@ import io.github.game.input.InputManager;
 import io.github.game.input.InputMode;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.WorldInitService;
+import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
 
 public class GameScreen implements Screen {
@@ -44,10 +45,7 @@ public class GameScreen implements Screen {
         // Инициализация мира
         worldInitService.initializeWorld();
 
-        // Создание игрока и NPC
-        entityFactory.createPlayer(100, 100);
-        entityFactory.createNPC(300, 100);
-        entityFactory.createNPC(300, 100);
+        MemoryUtils.logMemoryUsage("GameScreen shown");
     }
 
     @Override
@@ -56,14 +54,24 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Обновление систем ECS (включая камеру)
-        engine.update(delta);
-
         // Устанавливаем viewport и обновляем матрицы камеры
         viewport.apply();
 
-        // Отрисовка гексовой карты (после обновления камеры)
+        // Отрисовка гексовой карты (сначала фон)
         hexMapRenderer.render();
+
+        // Обновление систем ECS (игрок и NPC поверх гексов)
+        engine.update(delta);
+
+        if (Gdx.graphics.getFrameId() % 60 == 0) { // Каждую секунду при 60 FPS
+            MemoryUtils.logMemoryUsage("During rendering");
+
+            if (MemoryUtils.isMemoryCritical()) {
+                Gdx.app.error("Memory", "CRITICAL: Memory is running low!");
+                // Можно предпринять действия по освобождению памяти
+                System.gc();
+            }
+        }
     }
 
     // Метод для смены режима ввода
