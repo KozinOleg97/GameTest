@@ -37,81 +37,69 @@ For example, `core:clean` removes `build` folder only from the `core` project.
 
 ```
 io.github.game
-│
 ├── core
-│   ├── world              # Ядро модели мира
-│   │   ├── hex            # Гексовая сетка, модели гексов
-│   │   ├── region         # Понятие региона (может занимать N гексов)
-│   │   └── time           # Модель игрового времени
-│   │
-│   ├── location           # Ядро модели локации
-│   │   ├── graph          # Граф точек интереса и связей внутри локации
-│   │   └── action         # Система действий, доступных на локации
-│   │
-│   └── gamecontext        # Контекст игры (состояние, доступ к мира/локации)
-│
-├── di                     # Внедрение зависимостей (остаётся, но расширяется)
+│   └── world
+│       ├── hex
+│       │   ├── Hex.java
+│       │   ├── HexCoordinates.java
+│       │   ├── HexType.java
+│       │   └── HexUtils.java
+│       └── HexMap.java
+├── di
 │   ├── modules
-│   │   ├── WorldModule.java
-│   │   ├── LocationModule.java
-│   │   └── ... 
+│   │   ├── CoreModule.java
+│   │   ├── ECSModule.java
+│   │   ├── GraphicsModule.java
+│   │   ├── InputModule.java
+│   │   ├── ScreenModule.java
+│   │   ├── ServicesModule.java
+│   │   └── WorldModule.java
 │   └── AppComponent.java
-│
-├── ecs                    # Сущности и системы (сильно расширяется)
-│   ├── components         # Компоненты
-│   │   ├── world          # Для сущностей на глобальной карте (WorldEntity)
-│   │   │   ├── HexPositionComponent.java   # Позиция на гексовой карте
-│   │   │   └── MovementIntentComponent.java # Намерение переместиться
-│   │   │
-│   │   ├── battle         # Для сущностей в бою (BattleEntity)
-│   │   │   ├── HealthComponent.java
-│   │   │   ├── StatsComponent.java
-│   │   │   └── TeamComponent.java
-│   │   │
-│   │   ├── common         # Общие для всех контекстов
-│   │   │   ├── IdentityComponent.java
-│   │   │   └── InventoryComponent.java
-│   │   │
-│   │   └── tags           # Тэги
-│   │       ├── PlayerPartyComponent.java   # Группа игрока
-│   │       └── ... 
-│   │
+├── ecs
+│   ├── components
+│   │   ├── tags
+│   │   │   ├── NPCComponent.java
+│   │   │   └── PlayerComponent.java
+│   │   ├── world
+│   │   │   └── HexComponent.java
+│   │   ├── PositionComponent.java
+│   │   ├── RenderComponent.java
+│   │   └── VelocityComponent.java
 │   ├── systems
-│   │   ├── world          # Системы для глобальной карты
-│   │   │   ├── WorldMovementSystem.java    # Перемещает группы по гексам
-│   │   │   └── RegionSimulationSystem.java # Обновляет состояния регионов
-│   │   │
-│   │   ├── battle         # Системы для боя
-│   │   │   ├── AutoBattleSystem.java       # Логика авто-боя
-│   │   │   ├── BattleLogSystem.java        # Генерация лога
-│   │   │   └── ...
-│   │   │
-│   │   └── common         # Общие системы (например, для локации)
-│   │       └── ...
-│   │
+│   │   ├── world
+│   │   │   └── WorldSimulationSystem.java
+│   │   ├── CameraControlSystem.java
+│   │   ├── MovementSystem.java
+│   │   ├── NPCLogicSystem.java
+│   │   ├── PlayerInputSystem.java
+│   │   └── RenderingSystem.java
 │   └── EntityFactory.java
-│
-├── view                   # Всё для отображения (заменяет старый ui)
-│   ├── screens           # Экраны (GameScreen теперь не один)
-│   │   ├── WorldMapScreen.java    # Отображение гексовой карты
-│   │   ├── LocationScreen.java    # Текстовое меню/диалог локации
-│   │   ├── BattleScreen.java      # Схематичное представление боя
-│   │   └── ...
-│   │
-│   └── renderers          # Рендереры, отделенные от систем
-│       ├── WorldMapRenderer.java  # Рендерит гексовую карту
-│       ├── BattleRenderer.java    # Рендерит поле боя
-│       └── ...
-│
-├── services               # Сервисы (расширяются)
-│   ├── SaveLoadService.java       # Сервис сохранения/загрузки мира и прогресса
-│   ├── LocationGenerator.java     # Генератор процедурных локаций
-│   └── ...
-│
-└── utils                  # Утилиты (остаются)
-    ├── GameSettings.java
-    ├── ResourceManager.java
-    └── ...
+├── input
+│   ├── BattleInputProcessor.java
+│   ├── InputManager.java
+│   ├── InputMode.java
+│   └── WorldMapInputProcessor.java
+├── renderer
+│   └── HexMapRenderer.java
+├── services
+│   ├── AssetService.java
+│   ├── GameInputAdapter.java
+│   ├── InputService.java
+│   └── WorldInitService.java
+├── ui
+│   └── screens
+│       ├── GameScreen.java
+│       ├── LoadingScreen.java
+│       ├── ScreenFactory.java
+│       ├── ScreenFactoryImpl.java
+│       └── ScreenSwitcher.java
+├── utils
+│   ├── GameSettings.java
+│   ├── GameSettingsConstants.java
+│   ├── GraphicsConstants.java
+│   ├── MemoryUtils.java
+│   └── ResourceManager.java
+└── MainGame.java
 ```
 
 

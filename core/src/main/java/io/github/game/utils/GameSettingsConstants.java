@@ -33,8 +33,8 @@ public final class GameSettingsConstants {
     public static final float DEFAULT_MUSIC_VOLUME = 0.7f;
     public static final float DEFAULT_SFX_VOLUME = 0.9f;
     // Графические значения по умолчанию
-    public static final int DEFAULT_RESOLUTION_WIDTH = 800;
-    public static final int DEFAULT_RESOLUTION_HEIGHT = 480;
+    public static final int DEFAULT_RESOLUTION_WIDTH = 960;
+    public static final int DEFAULT_RESOLUTION_HEIGHT = 720;
     public static final boolean DEFAULT_FULLSCREEN = false;
     public static final boolean DEFAULT_VSYNC = true;
     public static final String DEFAULT_VIEWPORT_TYPE = "fit";
