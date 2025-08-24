@@ -1,12 +1,12 @@
 package io.github.game.core.world.hex;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Утилитарный класс для математических операций с гексами
  */
+@UtilityClass
 public final class HexUtils {
-
-    private HexUtils() {
-    } // Утилитарный класс
 
     /**
      * Вычисляет расстояние между двумя гексами

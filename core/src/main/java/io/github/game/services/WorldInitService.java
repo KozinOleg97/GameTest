@@ -10,6 +10,7 @@ import io.github.game.ecs.components.world.HexComponent;
 import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Getter;
 
 /**
  * Сервис для инициализации игрового мира. Создает сущности ECS для всех гексов карты.
@@ -20,12 +21,14 @@ public class WorldInitService {
     private final PooledEngine engine;
     private final HexMap hexMap;
     private final EntityFactory entityFactory;
-    private boolean initialized = false;
+    @Getter
+    private boolean hexEntitiesCreated = false;
+
     /**
      * Инициализирует игровой мир, создавая сущности для всех гексов
      */
     private boolean playerCreated = false;
-    private boolean npcsCreated = false;
+
     @Inject
     public WorldInitService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory) {
         this.engine = engine;
@@ -33,29 +36,25 @@ public class WorldInitService {
         this.entityFactory = entityFactory;
     }
 
-    public void initializeWorld() {
-        if (initialized) {
+    /**
+     * Создает ECS-сущности для всех гексов на карте. Гарантирует однократное создание сущностей
+     * (идемпотентность).
+     */
+    public void initializeHexEntities() {
+        if (hexEntitiesCreated) {
+            Gdx.app.log("WorldInit", "Hex entities already created, skipping");
             return;
         }
 
-        MemoryUtils.logMemoryUsage("Before world initialization");
-        Gdx.app.log("Init", "Initializing world with " + hexMap.getHexes().size() + " hexes");
+        MemoryUtils.logMemoryUsage("Before hex entities creation");
+        Gdx.app.log("WorldInit", "Creating entities for " + hexMap.size() + " hexes");
 
+        // Создаем сущности для всех гексов на карте
         hexMap.getHexes().values().forEach(entityFactory::createHexEntity);
+        hexEntitiesCreated = true;
 
-        if (!playerCreated) {
-            entityFactory.createPlayer(100, 100);
-            playerCreated = true;
-        }
-
-        if (!npcsCreated) {
-            entityFactory.createNPC(200, 200);
-            npcsCreated = true;
-        }
-
-        initialized = true;
-        Gdx.app.log("Init", "World initialization completed");
-        MemoryUtils.logMemoryUsage("After world initialization");
+        Gdx.app.log("WorldInit", "Hex entities creation completed");
+        MemoryUtils.logMemoryUsage("After hex entities creation");
     }
 
     /**
@@ -66,20 +65,15 @@ public class WorldInitService {
         for (Entity entity : engine.getEntitiesFor(family)) {
             engine.removeEntity(entity);
         }
-        initialized = false;
+        hexEntitiesCreated = false;
+        Gdx.app.log("WorldInit", "Hex entities cleared");
     }
 
     /**
      * Сбрасывает состояние инициализации
      */
     public void reset() {
-        initialized = false;
+        hexEntitiesCreated = false;
     }
 
-    /**
-     * Проверяет, был ли мир уже инициализирован
-     */
-    public boolean isInitialized() {
-        return initialized;
-    }
 }

@@ -11,6 +11,7 @@ import io.github.game.ecs.EntityFactory;
 import io.github.game.input.InputManager;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.AssetService;
+import io.github.game.services.EntityManagementService;
 import io.github.game.services.WorldInitService;
 import io.github.game.utils.ResourceManager;
 import java.util.Objects;
@@ -31,6 +32,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final HexMapRenderer hexMapRenderer;
     private final InputManager inputManager;
     private final Viewport viewport;
+    private final EntityManagementService entityManagementService;
 
     @Inject
     public ScreenFactoryImpl(ResourceManager resourceManager,
@@ -43,7 +45,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              PooledEngine engine,
                              HexMapRenderer hexMapRenderer,
                              InputManager inputManager,
-                             Viewport viewport) {
+                             Viewport viewport,
+                             EntityManagementService entityManagementService) {
         this.resourceManager = resourceManager;
         this.spriteBatch = spriteBatch;
         this.assetService = assetService;
@@ -55,6 +58,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
         this.hexMapRenderer = hexMapRenderer;
         this.inputManager = inputManager;
         this.viewport = viewport;
+        this.entityManagementService = entityManagementService;
     }
 
 
@@ -76,7 +80,9 @@ public class ScreenFactoryImpl implements ScreenFactory {
             Objects.requireNonNull(worldInitService, "WorldInitService must not be null"),
             Objects.requireNonNull(hexMapRenderer, "HexMapRenderer must not be null"),
             Objects.requireNonNull(inputManager, "InputManager must not be null"),
-            Objects.requireNonNull(viewport, "Viewport must not be null")
+            Objects.requireNonNull(viewport, "Viewport must not be null"),
+            Objects.requireNonNull(entityManagementService,
+                                   "EntityManagementService must not be null")
 
         );
     }

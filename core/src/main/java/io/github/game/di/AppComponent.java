@@ -9,8 +9,14 @@ import io.github.game.di.modules.GraphicsModule;
 import io.github.game.di.modules.InputModule;
 import io.github.game.di.modules.ScreenModule;
 import io.github.game.di.modules.ServicesModule;
+import io.github.game.di.modules.SettingsModule;
 import io.github.game.di.modules.WorldModule;
 import io.github.game.services.AssetService;
+import io.github.game.settings.AudioSettings;
+import io.github.game.settings.CameraSettings;
+import io.github.game.settings.GameplaySettings;
+import io.github.game.settings.GraphicsSettings;
+import io.github.game.settings.impl.SettingsFacade;
 import io.github.game.ui.screens.LoadingScreen;
 import javax.inject.Singleton;
 
@@ -23,10 +29,22 @@ import javax.inject.Singleton;
     WorldModule.class,
     GraphicsModule.class,
     InputModule.class,
+    SettingsModule.class,
 })
 public interface AppComponent {
 
     void inject(MainGame game);
+
+
+    GraphicsSettings graphicsSettings();
+
+    AudioSettings audioSettings();
+
+    GameplaySettings gameplaySettings();
+
+    CameraSettings cameraSettings();
+
+    SettingsFacade settingsFacade();
 
     // Для экрана загрузки
     SpriteBatch spriteBatch();

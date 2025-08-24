@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import io.github.game.input.InputMode;
 import io.github.game.services.InputService;
-import io.github.game.utils.GameSettings;
+import io.github.game.settings.CameraSettings;
+import io.github.game.settings.GraphicsSettings;
 import javax.inject.Inject;
 
 /**
@@ -18,7 +19,8 @@ public class CameraControlSystem extends EntitySystem {
 
     private final OrthographicCamera camera;
     private final InputService inputService;
-    private final GameSettings gameSettings;
+    private final GraphicsSettings graphicsSettings;
+    private final CameraSettings cameraSettings;
 
     // Векторы для хранения начальных позиций касания и камеры
     private final Vector3 touchStart = new Vector3();
@@ -37,10 +39,12 @@ public class CameraControlSystem extends EntitySystem {
     @Inject
     public CameraControlSystem(OrthographicCamera camera,
                                InputService inputService,
-                               GameSettings gameSettings) {
+                               GraphicsSettings graphicsSettings,
+                               CameraSettings cameraSettings) {
         this.camera = camera;
         this.inputService = inputService;
-        this.gameSettings = gameSettings;
+        this.graphicsSettings = graphicsSettings;
+        this.cameraSettings = cameraSettings;
     }
 
     /**
@@ -85,7 +89,7 @@ public class CameraControlSystem extends EntitySystem {
         touchStart.set(currentWorldCoords.x, currentWorldCoords.y, 0);
         cameraStart.set(camera.position);
 
-        if (gameSettings.isDebugMode()) {
+        if (graphicsSettings.isDebugMode()) {
             Gdx.app.log("CameraControlSystem", "Touch started at: " + touchStart);
         }
         return true;
@@ -129,7 +133,7 @@ public class CameraControlSystem extends EntitySystem {
             // Перемещаем камеру
             camera.position.set(cameraStart.x - deltaX, cameraStart.y - deltaY, 0);
 
-            if (gameSettings.isDebugMode()) {
+            if (graphicsSettings.isDebugMode()) {
                 Gdx.app.log("CameraControlSystem",
                             "Camera position: " + camera.position.x + ", " + camera.position.y);
             }
@@ -152,10 +156,10 @@ public class CameraControlSystem extends EntitySystem {
         }
 
         // Используем настройки из GameSettings
-        float newZoom = camera.zoom - amountY * gameSettings.getCameraZoomSensitivity();
+        float newZoom = camera.zoom - amountY * cameraSettings.getCameraZoomSensitivity();
         camera.zoom = Math.max(
-            gameSettings.getCameraMinZoom(),
-            Math.min(gameSettings.getCameraMaxZoom(), newZoom)
+            cameraSettings.getCameraMinZoom(),
+            Math.min(cameraSettings.getCameraMaxZoom(), newZoom)
         );
         return true;
     }
@@ -175,7 +179,7 @@ public class CameraControlSystem extends EntitySystem {
      */
     private void handleKeyboardInput(float deltaTime) {
         // Используем настройки из GameSettings
-        float moveAmount = gameSettings.getCameraMoveSpeed() * deltaTime;
+        float moveAmount = cameraSettings.getCameraMoveSpeed() * deltaTime;
 
         // Движение вправо
         if (inputService.isRightPressed()) {

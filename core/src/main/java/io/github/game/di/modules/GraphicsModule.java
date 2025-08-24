@@ -10,7 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.game.core.world.HexMap;
 import io.github.game.renderer.HexMapRenderer;
-import io.github.game.utils.GameSettings;
+import io.github.game.settings.GraphicsSettings;
 import io.github.game.utils.GameSettingsConstants;
 import javax.inject.Singleton;
 
@@ -19,14 +19,15 @@ public class GraphicsModule {
 
     @Provides
     @Singleton
-    OrthographicCamera provideCamera(GameSettings gameSettings) {
+    OrthographicCamera provideCamera(GraphicsSettings graphicsSettings) {
         OrthographicCamera camera = new OrthographicCamera();
-        // Устанавливаем начальные параметры камеры
-        camera.setToOrtho(false, gameSettings.getResolutionWidth(),
-                          gameSettings.getResolutionHeight());
+        camera.setToOrtho(false, graphicsSettings.getResolutionWidth(),
+                          graphicsSettings.getResolutionHeight());
+
+        //TODO надо уточнить в какую точку ставить камеру
         camera.position.set(
-            gameSettings.getResolutionWidth() / 2f,
-            gameSettings.getResolutionHeight() / 2f,
+            graphicsSettings.getResolutionWidth() / 2f,
+            graphicsSettings.getResolutionHeight() / 2f,
             0
         );
         camera.update();
@@ -35,29 +36,26 @@ public class GraphicsModule {
 
     @Provides
     @Singleton
-    Viewport provideViewport(OrthographicCamera camera, GameSettings gameSettings) {
-        // Создаем viewport в зависимости от настроек
-        return switch (gameSettings.getViewportType()) {
+    Viewport provideViewport(OrthographicCamera camera, GraphicsSettings graphicsSettings) {
+        return switch (graphicsSettings.getViewportType()) {
             case GameSettingsConstants.VIEWPORT_TYPE_SCREEN -> new ScreenViewport(camera);
             case GameSettingsConstants.VIEWPORT_TYPE_STRETCH -> new StretchViewport(
-                gameSettings.getResolutionWidth(),
-                gameSettings.getResolutionHeight(),
+                graphicsSettings.getResolutionWidth(),
+                graphicsSettings.getResolutionHeight(),
                 camera
             );
             default -> new FitViewport(
-                gameSettings.getResolutionWidth(),
-                gameSettings.getResolutionHeight(),
+                graphicsSettings.getResolutionWidth(),
+                graphicsSettings.getResolutionHeight(),
                 camera
             );
         };
     }
 
-
     @Provides
     @Singleton
     ShapeRenderer provideShapeRenderer() {
         ShapeRenderer shapeRenderer = new ShapeRenderer();
-        // Можно установить дополнительные параметры рендерера, если нужно
         shapeRenderer.setAutoShapeType(true);
         return shapeRenderer;
     }

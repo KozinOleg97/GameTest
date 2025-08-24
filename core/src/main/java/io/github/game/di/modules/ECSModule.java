@@ -13,7 +13,9 @@ import io.github.game.ecs.systems.PlayerInputSystem;
 import io.github.game.ecs.systems.RenderingSystem;
 import io.github.game.ecs.systems.world.WorldSimulationSystem;
 import io.github.game.services.InputService;
-import io.github.game.utils.GameSettings;
+import io.github.game.settings.CameraSettings;
+import io.github.game.settings.GameplaySettings;
+import io.github.game.settings.GraphicsSettings;
 import io.github.game.utils.ResourceManager;
 import javax.inject.Singleton;
 
@@ -35,8 +37,8 @@ public class ECSModule {
     @Provides
     @Singleton
     PlayerInputSystem providePlayerInputSystem(InputService inputService,
-                                               GameSettings gameSettings) {
-        return new PlayerInputSystem(inputService, gameSettings);
+                                               GameplaySettings gameplaySettings) {
+        return new PlayerInputSystem(inputService, gameplaySettings);
     }
 
     @Provides
@@ -47,8 +49,8 @@ public class ECSModule {
 
     @Provides
     @Singleton
-    NPCLogicSystem provideNPCLogicSystem(GameSettings gameSettings) {
-        return new NPCLogicSystem(gameSettings);
+    NPCLogicSystem provideNPCLogicSystem(GameplaySettings gameplaySettings) {
+        return new NPCLogicSystem(gameplaySettings);
     }
 
 
@@ -86,7 +88,8 @@ public class ECSModule {
     @Singleton
     CameraControlSystem provideCameraControlSystem(OrthographicCamera camera,
                                                    InputService inputService,
-                                                   GameSettings gameSettings) {
-        return new CameraControlSystem(camera, inputService, gameSettings);
+                                                   GraphicsSettings graphicsSettings,
+                                                   CameraSettings cameraSettings) {
+        return new CameraControlSystem(camera, inputService, graphicsSettings, cameraSettings);
     }
 }

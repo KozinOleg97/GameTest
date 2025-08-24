@@ -8,7 +8,6 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.game.MainGame;
 import io.github.game.ui.screens.ScreenSwitcher;
-import io.github.game.utils.GameSettings;
 import io.github.game.utils.ResourceManager;
 import javax.inject.Singleton;
 
@@ -44,12 +43,6 @@ public class CoreModule {
         // return new BitmapFont(Gdx.files.internal("fonts/myfont.fnt"));
     }
 
-
-    @Provides
-    @Singleton
-    GameSettings provideGameSettings() {
-        return new GameSettings();
-    }
 
     @Provides
     @Singleton

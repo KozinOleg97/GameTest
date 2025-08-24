@@ -7,7 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import io.github.game.ecs.components.VelocityComponent;
 import io.github.game.ecs.components.tags.PlayerComponent;
 import io.github.game.services.InputService;
-import io.github.game.utils.GameSettings;
+import io.github.game.settings.GameplaySettings;
 import javax.inject.Inject;
 
 public class PlayerInputSystem extends IteratingSystem {
@@ -16,22 +16,25 @@ public class PlayerInputSystem extends IteratingSystem {
         VelocityComponent.class);
 
     private final InputService inputService;
-    private final GameSettings gameSettings;
+    private final GameplaySettings gameplaySettings;
 
     @Inject
-    public PlayerInputSystem(InputService inputService, GameSettings gameSettings) {
+    public PlayerInputSystem(InputService inputService, GameplaySettings gameplaySettings
+    ) {
         super(Family.all(
             PlayerComponent.class,
             VelocityComponent.class
         ).get());
         this.inputService = inputService;
-        this.gameSettings = gameSettings;
+        this.gameplaySettings = gameplaySettings;
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         VelocityComponent velocity = VELOCITY.get(entity);
-        velocity.setVelocityX(inputService.getHorizontalAxis() * gameSettings.getSpeedMultiplier());
-        velocity.setVelocityY(inputService.getVerticalAxis() * gameSettings.getSpeedMultiplier());
+        velocity.setVelocityX(
+            inputService.getHorizontalAxis() * gameplaySettings.getSpeedMultiplier());
+        velocity.setVelocityY(
+            inputService.getVerticalAxis() * gameplaySettings.getSpeedMultiplier());
     }
 }

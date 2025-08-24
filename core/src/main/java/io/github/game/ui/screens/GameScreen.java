@@ -1,5 +1,7 @@
 package io.github.game.ui.screens;
 
+import static com.badlogic.gdx.math.MathUtils.random;
+
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -9,6 +11,7 @@ import io.github.game.ecs.EntityFactory;
 import io.github.game.input.InputManager;
 import io.github.game.input.InputMode;
 import io.github.game.renderer.HexMapRenderer;
+import io.github.game.services.EntityManagementService;
 import io.github.game.services.WorldInitService;
 import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
@@ -20,7 +23,8 @@ public class GameScreen implements Screen {
     private final WorldInitService worldInitService;
     private final HexMapRenderer hexMapRenderer;
     private final InputManager inputManager;
-    private final Viewport viewport; // Добавляем Viewport
+    private final Viewport viewport;
+    private final EntityManagementService entityManagementService;
 
     @Inject
     public GameScreen(PooledEngine engine,
@@ -28,13 +32,15 @@ public class GameScreen implements Screen {
                       WorldInitService worldInitService,
                       HexMapRenderer hexMapRenderer,
                       InputManager inputManager,
-                      Viewport viewport) { // Добавляем Viewport в конструктор
+                      Viewport viewport,
+                      EntityManagementService entityManagementService) {
         this.engine = engine;
         this.entityFactory = entityFactory;
         this.worldInitService = worldInitService;
         this.hexMapRenderer = hexMapRenderer;
         this.inputManager = inputManager;
         this.viewport = viewport;
+        this.entityManagementService = entityManagementService;
     }
 
     @Override
@@ -42,8 +48,20 @@ public class GameScreen implements Screen {
         // Установка обработчика ввода
         Gdx.input.setInputProcessor(inputManager.getInputMultiplexer());
 
-        // Инициализация мира
-        worldInitService.initializeWorld();
+        // Инициализация гексов (создание ECS-сущностей)
+        worldInitService.initializeHexEntities();
+
+        // Создание игрока и NPC через отдельный сервис
+        entityManagementService.createPlayer(100, 100);
+
+
+        for (int i = 0; i < 1000; i++) {
+            entityManagementService.createNPC(random.nextInt(1000), random.nextInt(1000));
+        }
+
+
+
+
 
         MemoryUtils.logMemoryUsage("GameScreen shown");
     }

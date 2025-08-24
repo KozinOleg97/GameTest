@@ -2,15 +2,13 @@ package io.github.game.core.world;
 
 import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexCoordinates;
-import io.github.game.core.world.hex.HexType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * Представляет карту гексов игрового мира. Использует Map для хранения гексов, что позволяет
- * работать с разреженными картами.
+ * Чистый контейнер для хранения гексов. Только данные, без логики генерации.
  */
 public class HexMap {
 
@@ -64,21 +62,37 @@ public class HexMap {
     }
 
     /**
-     * Создает и добавляет прямоугольную область гексов
-     *
-     * @param startQ начальная координата Q
-     * @param startR начальная координата R
-     * @param width  ширина области
-     * @param height высота области
-     * @param type   тип гексов
+     * Возвращает количество гексов на карте
+     * @return количество гексов
      */
-    public void generateRectangularArea(int startQ, int startR, int width, int height,
-                                        HexType type) {
-        for (int q = startQ; q < startQ + width; q++) {
-            for (int r = startR; r < startR + height; r++) {
-                Hex hex = new Hex(q, r, type);
-                addHex(hex);
-            }
-        }
+    public int size() {
+        return hexes.size();
     }
+
+    /**
+     * Очищает карту, удаляя все гексы
+     * Используется при перезагрузке мира или смене карты
+     */
+    public void clear() {
+        hexes.clear();
+    }
+
+//    /**
+//     * Создает и добавляет прямоугольную область гексов
+//     *
+//     * @param startQ начальная координата Q
+//     * @param startR начальная координата R
+//     * @param width  ширина области
+//     * @param height высота области
+//     * @param type   тип гексов
+//     */
+//    public void generateRectangularArea(int startQ, int startR, int width, int height,
+//                                        HexType type) {
+//        for (int q = startQ; q < startQ + width; q++) {
+//            for (int r = startR; r < startR + height; r++) {
+//                Hex hex = new Hex(q, r, type);
+//                addHex(hex);
+//            }
+//        }
+//    }
 }
