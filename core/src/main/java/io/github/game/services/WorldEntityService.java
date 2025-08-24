@@ -16,7 +16,7 @@ import lombok.Getter;
  * Сервис для инициализации игрового мира. Создает сущности ECS для всех гексов карты.
  */
 @Singleton
-public class WorldInitService {
+public class WorldEntityService {
 
     private final PooledEngine engine;
     private final HexMap hexMap;
@@ -30,7 +30,7 @@ public class WorldInitService {
     private boolean playerCreated = false;
 
     @Inject
-    public WorldInitService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory) {
+    public WorldEntityService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory) {
         this.engine = engine;
         this.hexMap = hexMap;
         this.entityFactory = entityFactory;

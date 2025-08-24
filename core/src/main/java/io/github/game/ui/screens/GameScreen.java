@@ -12,7 +12,7 @@ import io.github.game.input.InputManager;
 import io.github.game.input.InputMode;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.EntityManagementService;
-import io.github.game.services.WorldInitService;
+import io.github.game.services.WorldEntityService;
 import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
 
@@ -20,7 +20,7 @@ public class GameScreen implements Screen {
 
     private final PooledEngine engine;
     private final EntityFactory entityFactory;
-    private final WorldInitService worldInitService;
+    private final WorldEntityService worldEntityService;
     private final HexMapRenderer hexMapRenderer;
     private final InputManager inputManager;
     private final Viewport viewport;
@@ -29,14 +29,14 @@ public class GameScreen implements Screen {
     @Inject
     public GameScreen(PooledEngine engine,
                       EntityFactory entityFactory,
-                      WorldInitService worldInitService,
+                      WorldEntityService worldEntityService,
                       HexMapRenderer hexMapRenderer,
                       InputManager inputManager,
                       Viewport viewport,
                       EntityManagementService entityManagementService) {
         this.engine = engine;
         this.entityFactory = entityFactory;
-        this.worldInitService = worldInitService;
+        this.worldEntityService = worldEntityService;
         this.hexMapRenderer = hexMapRenderer;
         this.inputManager = inputManager;
         this.viewport = viewport;
@@ -49,7 +49,7 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(inputManager.getInputMultiplexer());
 
         // Инициализация гексов (создание ECS-сущностей)
-        worldInitService.initializeHexEntities();
+        worldEntityService.initializeHexEntities();
 
         // Создание игрока и NPC через отдельный сервис
         entityManagementService.createPlayer(100, 100);

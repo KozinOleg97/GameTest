@@ -7,7 +7,7 @@ import io.github.game.core.world.HexMap;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.services.AssetService;
 import io.github.game.services.InputService;
-import io.github.game.services.WorldInitService;
+import io.github.game.services.WorldEntityService;
 import io.github.game.utils.ResourceManager;
 import javax.inject.Singleton;
 
@@ -28,8 +28,8 @@ public class ServicesModule {
 
     @Provides
     @Singleton
-    WorldInitService provideWorldInitService(PooledEngine engine, HexMap hexMap,
-                                             EntityFactory entityFactory) {
-        return new WorldInitService(engine, hexMap, entityFactory);
+    WorldEntityService provideWorldEntityService(PooledEngine engine, HexMap hexMap,
+                                                 EntityFactory entityFactory) {
+        return new WorldEntityService(engine, hexMap, entityFactory);
     }
 }

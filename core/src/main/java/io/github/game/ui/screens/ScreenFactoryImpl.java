@@ -12,7 +12,7 @@ import io.github.game.input.InputManager;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.AssetService;
 import io.github.game.services.EntityManagementService;
-import io.github.game.services.WorldInitService;
+import io.github.game.services.WorldEntityService;
 import io.github.game.utils.ResourceManager;
 import java.util.Objects;
 import javax.inject.Inject;
@@ -26,7 +26,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final AssetService assetService;
     private final BitmapFont font;
     private final ScreenSwitcher screenSwitcher;
-    private final WorldInitService worldInitService;
+    private final WorldEntityService worldEntityService;
     private final EntityFactory entityFactory;
     private final PooledEngine engine;
     private final HexMapRenderer hexMapRenderer;
@@ -40,7 +40,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              AssetService assetService,
                              BitmapFont font,
                              ScreenSwitcher screenSwitcher,
-                             WorldInitService worldInitService,
+                             WorldEntityService worldEntityService,
                              EntityFactory entityFactory,
                              PooledEngine engine,
                              HexMapRenderer hexMapRenderer,
@@ -53,7 +53,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
         this.font = font;
         this.screenSwitcher = screenSwitcher;
         this.engine = engine;
-        this.worldInitService = worldInitService;
+        this.worldEntityService = worldEntityService;
         this.entityFactory = entityFactory;
         this.hexMapRenderer = hexMapRenderer;
         this.inputManager = inputManager;
@@ -77,7 +77,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
         return new GameScreen(
             Objects.requireNonNull(engine, "Engine must not be null"),
             Objects.requireNonNull(entityFactory, "EntityFactory must not be null"),
-            Objects.requireNonNull(worldInitService, "WorldInitService must not be null"),
+            Objects.requireNonNull(worldEntityService, "WorldntityService must not be null"),
             Objects.requireNonNull(hexMapRenderer, "HexMapRenderer must not be null"),
             Objects.requireNonNull(inputManager, "InputManager must not be null"),
             Objects.requireNonNull(viewport, "Viewport must not be null"),
