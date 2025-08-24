@@ -11,7 +11,7 @@ import io.github.game.ecs.EntityFactory;
 import io.github.game.input.InputManager;
 import io.github.game.input.InputMode;
 import io.github.game.renderer.HexMapRenderer;
-import io.github.game.services.EntityManagementService;
+import io.github.game.services.CharacterEntityService;
 import io.github.game.services.WorldEntityService;
 import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
@@ -24,7 +24,7 @@ public class GameScreen implements Screen {
     private final HexMapRenderer hexMapRenderer;
     private final InputManager inputManager;
     private final Viewport viewport;
-    private final EntityManagementService entityManagementService;
+    private final CharacterEntityService characterEntityService;
 
     @Inject
     public GameScreen(PooledEngine engine,
@@ -33,14 +33,14 @@ public class GameScreen implements Screen {
                       HexMapRenderer hexMapRenderer,
                       InputManager inputManager,
                       Viewport viewport,
-                      EntityManagementService entityManagementService) {
+                      CharacterEntityService characterEntityService) {
         this.engine = engine;
         this.entityFactory = entityFactory;
         this.worldEntityService = worldEntityService;
         this.hexMapRenderer = hexMapRenderer;
         this.inputManager = inputManager;
         this.viewport = viewport;
-        this.entityManagementService = entityManagementService;
+        this.characterEntityService = characterEntityService;
     }
 
     @Override
@@ -52,11 +52,11 @@ public class GameScreen implements Screen {
         worldEntityService.initializeHexEntities();
 
         // Создание игрока и NPC через отдельный сервис
-        entityManagementService.createPlayer(100, 100);
+        characterEntityService.createPlayer(100, 100);
 
 
         for (int i = 0; i < 1000; i++) {
-            entityManagementService.createNPC(random.nextInt(1000), random.nextInt(1000));
+            characterEntityService.createNPC(random.nextInt(1000), random.nextInt(1000));
         }
 
 

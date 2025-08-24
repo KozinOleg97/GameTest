@@ -10,7 +10,7 @@ import javax.inject.Singleton;
  * Сервис для управления игровыми сущностями (игрок, NPC и т.д.).
  */
 @Singleton
-public class EntityManagementService {
+public class CharacterEntityService {
 
     private final PooledEngine engine;
     private final EntityFactory entityFactory;
@@ -23,7 +23,7 @@ public class EntityManagementService {
      * @param entityFactory фабрика для создания сущностей
      */
     @Inject
-    public EntityManagementService(PooledEngine engine, EntityFactory entityFactory) {
+    public CharacterEntityService(PooledEngine engine, EntityFactory entityFactory) {
         this.engine = engine;
         this.entityFactory = entityFactory;
     }
