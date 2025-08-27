@@ -37,7 +37,7 @@ public class GameScreen implements Screen {
                       InputManager inputManager,
                       Viewport viewport,
                       CharacterEntityService characterEntityService,
-                      PerformanceMonitor performanceMonitor                      ) {
+                      PerformanceMonitor performanceMonitor) {
         this.engine = engine;
         this.entityFactory = entityFactory;
         this.worldEntityService = worldEntityService;
@@ -59,7 +59,7 @@ public class GameScreen implements Screen {
         // Создание игрока и NPC через отдельный сервис
         characterEntityService.createPlayer(100, 100);
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             characterEntityService.createNPC(random.nextInt(1000), random.nextInt(1000));
         }
 
@@ -87,7 +87,6 @@ public class GameScreen implements Screen {
         hexMapRenderer.render(); // Отрисовка гексовой карты (сначала фон)
         performanceMonitor.endEvent("hex_render");
 
-
         performanceMonitor.startEvent("ecs_update");
         engine.update(delta);// Обновление систем ECS (игрок и NPC поверх гексов)
         performanceMonitor.endEvent("ecs_update");
@@ -113,8 +112,11 @@ public class GameScreen implements Screen {
     // Остальные методы Screen
     @Override
     public void resize(int width, int height) {
-        // Обработка изменения размера экрана
+        // Обработка изменения размера основного viewport
         viewport.update(width, height, true);
+
+        // Обработка изменения размера UI viewport
+        performanceMonitor.resize(width, height);
     }
 
     @Override

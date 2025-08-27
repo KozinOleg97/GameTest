@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.game.di.AppComponent;
 import io.github.game.di.DaggerAppComponent;
 import io.github.game.di.modules.CoreModule;
+import io.github.game.monitoring.PerformanceMonitor;
 import io.github.game.settings.GraphicsSettings;
 import io.github.game.ui.screens.GameScreen;
 import io.github.game.ui.screens.LoadingScreen;
@@ -21,6 +22,8 @@ public class MainGame extends Game implements ScreenSwitcher {
     SpriteBatch spriteBatch;
     @Inject
     GraphicsSettings graphicsSettings;
+    @Inject
+    PerformanceMonitor performanceMonitor;
 
     private AppComponent appComponent;
     private LoadingScreen loadingScreen;
@@ -99,6 +102,9 @@ public class MainGame extends Game implements ScreenSwitcher {
             graphicsSettings.setResolutionWidth(width);
             graphicsSettings.setResolutionHeight(height);
         }
+
+        // Обновляем UI viewport
+        performanceMonitor.resize(width, height);
     }
 
     private void applyGraphicsSettings() {

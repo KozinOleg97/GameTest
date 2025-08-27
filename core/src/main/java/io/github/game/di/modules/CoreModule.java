@@ -50,6 +50,7 @@ public class CoreModule {
         return Gdx.input;
     }
 
+    //TODO Уточнить, к какому модулю лучше отнести
     @Provides
     @Singleton
     SpriteBatch provideSpriteBatch() {

@@ -5,11 +5,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.game.settings.GraphicsSettings;
 import io.github.game.utils.MemoryUtils;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
@@ -20,7 +22,10 @@ import javax.inject.Singleton;
 public class PerformanceMonitor implements Disposable {
 
     private final GraphicsSettings graphicsSettings;
-    private final SpriteBatch spriteBatch;
+    private final SpriteBatch uiSpriteBatch; // Отдельный SpriteBatch для UI
+    private final Viewport uiViewport; // Отдельный Viewport для UI
+
+
     private final BitmapFont font;
     private final Array<Float> frameTimes;
     private final int updateInterval = 60; // Обновлять статистику каждые 60 кадров
@@ -36,10 +41,12 @@ public class PerformanceMonitor implements Disposable {
 
     @Inject
     public PerformanceMonitor(GraphicsSettings graphicsSettings,
-                              SpriteBatch spriteBatch,
+                              @Named("uiSpriteBatch") SpriteBatch uiSpriteBatch,
+                              @Named("uiViewport") Viewport uiViewport,
                               BitmapFont font) {
         this.graphicsSettings = graphicsSettings;
-        this.spriteBatch = spriteBatch;
+        this.uiSpriteBatch = uiSpriteBatch;
+        this.uiViewport = uiViewport;
         this.font = font;
 
         this.frameTimes = new Array<>();
@@ -74,49 +81,54 @@ public class PerformanceMonitor implements Disposable {
             return;
         }
 
-        spriteBatch.begin();
+        // Устанавливаем UI Viewport и обновляем его
+        uiViewport.apply();
+        uiSpriteBatch.setProjectionMatrix(uiViewport.getCamera().combined);
+
+        uiSpriteBatch.begin();
 
         // Отображаем базовую статистику
-        int yPosition = Gdx.graphics.getHeight() - 20;
+        int yPosition = (int) (uiViewport.getWorldHeight() - 20);
         int lineHeight = 20;
 
-        font.draw(spriteBatch, "FPS: " + fps, 20, yPosition);
+        font.draw(uiSpriteBatch, "FPS: " + fps, 20, yPosition);
         yPosition -= lineHeight;
 
-        font.draw(spriteBatch, "Memory: " + MemoryUtils.getUsedMemoryMB() + "MB / " +
-                               MemoryUtils.getTotalMemoryMB() + "MB (" +
-                               MemoryUtils.getMemoryUsagePercent() + "%)",
+        font.draw(uiSpriteBatch, "Memory: " + MemoryUtils.getUsedMemoryMB() + "MB / " +
+                                 MemoryUtils.getTotalMemoryMB() + "MB (" +
+                                 MemoryUtils.getMemoryUsagePercent() + "%)",
                   20, yPosition);
         yPosition -= lineHeight;
 
-        font.draw(spriteBatch, "Max Memory: " + MemoryUtils.getMaxMemoryMB() + "MB", 20, yPosition);
+        font.draw(uiSpriteBatch, "Max Memory: " + MemoryUtils.getMaxMemoryMB() + "MB", 20,
+                  yPosition);
         yPosition -= lineHeight;
 
         // Дополнительная статистика
-        font.draw(spriteBatch, "Frame Time: " + getAverageFrameTime() + "ms", 20, yPosition);
+        font.draw(uiSpriteBatch, "Frame Time: " + getAverageFrameTime() + "ms", 20, yPosition);
         yPosition -= lineHeight;
 
         // Расширенная статистика (если включена)
         if (extendedStats) {
-            font.draw(spriteBatch, "Entities: " + getEntityCount(), 20, yPosition);
+            font.draw(uiSpriteBatch, "Entities: " + getEntityCount(), 20, yPosition);
             yPosition -= lineHeight;
 
             // Кастомные метрики
             for (Map.Entry<String, String> entry : customMetrics.entrySet()) {
-                font.draw(spriteBatch, entry.getKey() + ": " + entry.getValue(), 20, yPosition);
+                font.draw(uiSpriteBatch, entry.getKey() + ": " + entry.getValue(), 20, yPosition);
                 yPosition -= lineHeight;
             }
 
             // Длительности событий
             for (Map.Entry<String, Float> entry : eventDurations.entrySet()) {
-                font.draw(spriteBatch,
+                font.draw(uiSpriteBatch,
                           entry.getKey() + ": " + String.format("%.2fms", entry.getValue()),
-                          Gdx.graphics.getWidth() - 200, yPosition);
+                          uiViewport.getWorldWidth() - 200, yPosition);
                 yPosition -= lineHeight;
             }
         }
 
-        spriteBatch.end();
+        uiSpriteBatch.end();
     }
 
     /**
@@ -212,15 +224,6 @@ public class PerformanceMonitor implements Disposable {
         return MemoryUtils.getMaxMemoryMB();
     }
 
-    @Override
-    public void dispose() {
-        // Очищаем ресурсы
-        frameTimes.clear();
-        customMetrics.clear();
-        events.clear();
-        eventDurations.clear();
-        Gdx.app.log("PerformanceMonitor", "Performance monitor disposed");
-    }
 
     /**
      * Возвращает количество активных сущностей (заглушка для будущей реализации).
@@ -251,6 +254,23 @@ public class PerformanceMonitor implements Disposable {
     }
 
     /**
+     * Обрабатывает изменение размера экрана для UI Viewport.
+     */
+    public void resize(int width, int height) {
+        uiViewport.update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        // Очищаем ресурсы
+        frameTimes.clear();
+        customMetrics.clear();
+        events.clear();
+        eventDurations.clear();
+        Gdx.app.log("PerformanceMonitor", "Performance monitor disposed");
+    }
+
+    /**
      * Обновляет статистику производительности.
      */
     private void updatePerformanceStats() {
@@ -268,4 +288,5 @@ public class PerformanceMonitor implements Disposable {
             Gdx.app.error("PerformanceMonitor", "CRITICAL: Memory usage is over 80%!");
         }
     }
+
 }

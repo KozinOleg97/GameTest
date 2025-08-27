@@ -1,6 +1,7 @@
 package io.github.game.di.modules;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -12,6 +13,7 @@ import io.github.game.core.world.HexMap;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.settings.GraphicsSettings;
 import io.github.game.utils.GameSettingsConstants;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Module
@@ -66,5 +68,19 @@ public class GraphicsModule {
                                          ShapeRenderer shapeRenderer,
                                          OrthographicCamera camera) {
         return new HexMapRenderer(hexMap, shapeRenderer, camera);
+    }
+
+    @Provides
+    @Singleton
+    @Named("uiViewport")
+    Viewport provideUiViewport() {
+        return new ScreenViewport(); // Viewport для UI, который не зависит от камеры мира
+    }
+
+    @Provides
+    @Singleton
+    @Named("uiSpriteBatch")
+    SpriteBatch provideUiSpriteBatch() {
+        return new SpriteBatch();
     }
 }
