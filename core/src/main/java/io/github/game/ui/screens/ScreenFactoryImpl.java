@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.input.InputManager;
+import io.github.game.monitoring.PerformanceMonitor;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.AssetService;
 import io.github.game.services.CharacterEntityService;
@@ -33,6 +34,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final InputManager inputManager;
     private final Viewport viewport;
     private final CharacterEntityService characterEntityService;
+    private final PerformanceMonitor performanceMonitor;
 
     @Inject
     public ScreenFactoryImpl(ResourceManager resourceManager,
@@ -46,7 +48,9 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              HexMapRenderer hexMapRenderer,
                              InputManager inputManager,
                              Viewport viewport,
-                             CharacterEntityService characterEntityService) {
+                             CharacterEntityService characterEntityService,
+                             PerformanceMonitor performanceMonitor
+    ) {
         this.resourceManager = resourceManager;
         this.spriteBatch = spriteBatch;
         this.assetService = assetService;
@@ -59,6 +63,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
         this.inputManager = inputManager;
         this.viewport = viewport;
         this.characterEntityService = characterEntityService;
+        this.performanceMonitor = performanceMonitor;
     }
 
 
@@ -82,7 +87,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
             Objects.requireNonNull(inputManager, "InputManager must not be null"),
             Objects.requireNonNull(viewport, "Viewport must not be null"),
             Objects.requireNonNull(characterEntityService,
-                                   "CharacterEntityService must not be null")
+                                   "CharacterEntityService must not be null"),
+            Objects.requireNonNull(performanceMonitor, "PerformanceMonitor must not be null")
 
         );
     }
