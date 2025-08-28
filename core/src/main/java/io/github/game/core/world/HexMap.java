@@ -76,23 +76,4 @@ public class HexMap {
     public void clear() {
         hexes.clear();
     }
-
-//    /**
-//     * Создает и добавляет прямоугольную область гексов
-//     *
-//     * @param startQ начальная координата Q
-//     * @param startR начальная координата R
-//     * @param width  ширина области
-//     * @param height высота области
-//     * @param type   тип гексов
-//     */
-//    public void generateRectangularArea(int startQ, int startR, int width, int height,
-//                                        HexType type) {
-//        for (int q = startQ; q < startQ + width; q++) {
-//            for (int r = startR; r < startR + height; r++) {
-//                Hex hex = new Hex(q, r, type);
-//                addHex(hex);
-//            }
-//        }
-//    }
 }
