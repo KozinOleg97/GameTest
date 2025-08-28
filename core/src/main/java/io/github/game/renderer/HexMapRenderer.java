@@ -68,46 +68,6 @@ public class HexMapRenderer {
         shapeRenderer.dispose();
     }
 
-    private void drawHex(Hex hex) {
-        // Выбор цвета в зависимости от типа гекса
-        switch (hex.getType()) {
-            case PLAINS:
-                shapeRenderer.setColor(0.4f, 0.8f, 0.2f, 1); // Зеленый
-                break;
-            case FOREST:
-                shapeRenderer.setColor(0.2f, 0.6f, 0.1f, 1); // Темно-зеленый
-                break;
-            case MOUNTAINS:
-                shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1); // Серый
-                break;
-            case OCEAN:
-                shapeRenderer.setColor(0.2f, 0.4f, 0.8f, 1); // Синий
-                break;
-            default:
-                shapeRenderer.setColor(0.8f, 0.8f, 0.8f, 1); // Серый по умолчанию
-        }
-
-        List<Vector2> vertices = getHexVertices(hex);
-
-        // Рисуем шестиугольник как замкнутую полигональную линию
-        for (int i = 0; i < vertices.size(); i++) {
-            Vector2 current = vertices.get(i);
-            Vector2 next = vertices.get((i + 1) % vertices.size());
-            shapeRenderer.line(current.x, current.y, next.x, next.y);
-        }
-
-        // Заполняем гекс, рисуя треугольники от центра к вершинам
-        Vector2 center = getHexCenter(hex);
-        for (int i = 0; i < vertices.size(); i++) {
-            Vector2 current = vertices.get(i);
-            Vector2 next = vertices.get((i + 1) % vertices.size());
-            shapeRenderer.triangle(
-                center.x, center.y,
-                current.x, current.y,
-                next.x, next.y
-            );
-        }
-    }
 
     private void drawHexOutline(Hex hex) {
         shapeRenderer.setColor(0, 0, 0, 1); // Черный контур
@@ -125,20 +85,14 @@ public class HexMapRenderer {
     private void drawFilledHex(Hex hex) {
 
         switch (hex.getType()) {
-            case PLAINS:
-                shapeRenderer.setColor(0.4f, 0.8f, 0.2f, 1); // Зеленый
-                break;
-            case FOREST:
-                shapeRenderer.setColor(0.2f, 0.6f, 0.1f, 1); // Темно-зеленый
-                break;
-            case MOUNTAINS:
-                shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1); // Серый
-                break;
-            case OCEAN:
-                shapeRenderer.setColor(0.2f, 0.4f, 0.8f, 1); // Синий
-                break;
-            default:
-                shapeRenderer.setColor(0.8f, 0.8f, 0.8f, 1); // Серый по умолчанию
+            case PLAINS -> shapeRenderer.setColor(0.4f, 0.8f, 0.2f, 1);
+            case FOREST -> shapeRenderer.setColor(0.2f, 0.6f, 0.1f, 1);
+            case MOUNTAINS -> shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
+            case OCEAN -> shapeRenderer.setColor(0.2f, 0.4f, 0.8f, 1);
+            case COAST -> shapeRenderer.setColor(0.6f, 0.4f, 0.2f, 1);
+            case DESERT -> shapeRenderer.setColor(0.95f, 0.9f, 0.11f, 1);
+            case SWAMP -> shapeRenderer.setColor(0.1f, 0.2f, 0.1f, 1);
+            default -> shapeRenderer.setColor(0.9f, 0.1f, 0.9f, 1); // Розовый по умолчанию
         }
 
         List<Vector2> vertices = getHexVertices(hex);

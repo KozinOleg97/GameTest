@@ -27,7 +27,7 @@ public class WorldEntityService {
     /**
      * Инициализирует игровой мир, создавая сущности для всех гексов
      */
-    private boolean playerCreated = false;
+    private final boolean playerCreated = false;
 
     @Inject
     public WorldEntityService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory) {

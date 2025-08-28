@@ -54,6 +54,18 @@ public class GameplaySettingsImpl extends BaseSettingsImpl implements GameplaySe
     }
 
     @Override
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    @Override
+    public void setDifficulty(String difficulty) {
+        this.difficulty = validateDifficulty(difficulty);
+        putString(GameSettingsConstants.KEY_DIFFICULTY, this.difficulty);
+        save();
+    }
+
+    @Override
     public boolean isAutoSaveEnabled() {
         return autoSaveEnabled;
     }
@@ -77,18 +89,6 @@ public class GameplaySettingsImpl extends BaseSettingsImpl implements GameplaySe
                                             GameSettingsConstants.MAX_AUTO_SAVE_INTERVAL,
                                             "Auto-save interval");
         putInt(GameSettingsConstants.KEY_AUTO_SAVE_INTERVAL, this.autoSaveInterval);
-        save();
-    }
-
-    @Override
-    public String getDifficulty() {
-        return difficulty;
-    }
-
-    @Override
-    public void setDifficulty(String difficulty) {
-        this.difficulty = validateDifficulty(difficulty);
-        putString(GameSettingsConstants.KEY_DIFFICULTY, this.difficulty);
         save();
     }
 }

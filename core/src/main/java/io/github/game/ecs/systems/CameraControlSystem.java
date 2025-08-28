@@ -30,7 +30,7 @@ public class CameraControlSystem extends EntitySystem {
     // Поля для интерполяции
     private final Vector3 targetPosition = new Vector3();
     private final Vector3 smoothVelocity = new Vector3();
-    private boolean useSmoothing = true;
+    private final boolean useSmoothing = true;
     private float targetZoom = 1.0f;
     private float smoothZoomVelocity;
 

@@ -59,7 +59,7 @@ public class GameScreen implements Screen {
         // Создание игрока и NPC через отдельный сервис
         characterEntityService.createPlayer(100, 100);
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
             characterEntityService.createNPC(random.nextInt(1000), random.nextInt(1000));
         }
 

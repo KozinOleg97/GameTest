@@ -5,10 +5,10 @@ import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexType;
 
 /**
- * Реализация генератора, создающего прямоугольную область гексов.
- * Для тестирования.
+ * Реализация генератора, создающего прямоугольную область гексов. Для тестирования.
  */
 public class RectangularWorldGenerator implements WorldGenerator {
+
     private final int startQ;
     private final int startR;
     private final int width;
@@ -17,10 +17,11 @@ public class RectangularWorldGenerator implements WorldGenerator {
 
     /**
      * Создает генератор прямоугольной области
-     * @param startQ начальная координата Q (столбец)
-     * @param startR начальная координата R (строка)
-     * @param width ширина области в гексах
-     * @param height высота области в гексах
+     *
+     * @param startQ   начальная координата Q (столбец)
+     * @param startR   начальная координата R (строка)
+     * @param width    ширина области в гексах
+     * @param height   высота области в гексах
      * @param baseType базовый тип гексов для заполнения области
      */
     public RectangularWorldGenerator(int startQ, int startR, int width,
@@ -34,6 +35,7 @@ public class RectangularWorldGenerator implements WorldGenerator {
 
     /**
      * Генерирует прямоугольную область гексов
+     *
      * @return карта с заполненной прямоугольной областью
      */
     @Override

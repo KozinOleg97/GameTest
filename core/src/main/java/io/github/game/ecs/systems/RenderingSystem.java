@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import io.github.game.ecs.components.PositionComponent;
 import io.github.game.ecs.components.RenderComponent;
-import io.github.game.utils.MemoryUtils;
 
 public class RenderingSystem extends IteratingSystem {
 
@@ -29,7 +28,7 @@ public class RenderingSystem extends IteratingSystem {
 
     @Override
     public void update(float deltaTime) {
-        MemoryUtils.logMemoryUsage("RenderingSystem before update");
+//        MemoryUtils.logMemoryUsage("RenderingSystem before update");
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -40,7 +39,7 @@ public class RenderingSystem extends IteratingSystem {
             batch.end();
         }
 
-        MemoryUtils.logMemoryUsage("RenderingSystem after update");
+//        MemoryUtils.logMemoryUsage("RenderingSystem after update");
 
         // Логируем для отладки
         if (Gdx.graphics.getFrameId() % 60 == 0) {

@@ -23,8 +23,10 @@ public interface CameraSettings extends BaseSettings {
 
 
     float getCameraSmoothFactor();
+
     void setCameraSmoothFactor(float smoothTime);
 
     boolean isCameraSmoothingEnabled();
+
     void setCameraSmoothingEnabled(boolean enabled);
 }
