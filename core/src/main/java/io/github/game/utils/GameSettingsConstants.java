@@ -39,6 +39,8 @@ public final class GameSettingsConstants {
     public static final String KEY_CAMERA_MIN_ZOOM = "cameraMinZoom";
     public static final String KEY_CAMERA_MAX_ZOOM = "cameraMaxZoom";
     public static final String KEY_CAMERA_ZOOM_SENSITIVITY = "cameraZoomSensitivity";
+    public static final String KEY_CAMERA_SMOOTHING_ENABLED = "cameraSmoothingEnabled";
+    public static final String KEY_CAMERA_SMOOTH_FACTOR = "cameraSmoothingFactor";
 
     // Значения по умолчанию для графических настроек
     public static final int DEFAULT_RESOLUTION_WIDTH = 960;
@@ -65,6 +67,8 @@ public final class GameSettingsConstants {
     public static final float DEFAULT_CAMERA_MIN_ZOOM = 0.1f;
     public static final float DEFAULT_CAMERA_MAX_ZOOM = 6.0f;
     public static final float DEFAULT_CAMERA_ZOOM_SENSITIVITY = 0.1f;
+    public static final boolean DEFAULT_CAMERA_SMOOTHING_ENABLED = true;
+    public static final float DEFAULT_CAMERA_SMOOTH_FACTOR = 0.1f;
 
     // Ограничения значений
     public static final int MIN_RESOLUTION_WIDTH = 640;
@@ -76,11 +80,13 @@ public final class GameSettingsConstants {
     public static final float MIN_VOLUME = 0.0f;
     public static final float MAX_VOLUME = 1.0f;
     public static final float MIN_SPEED_MULTIPLIER = 10.0f;
-    public static final float MAX_SPEED_MULTIPLIER = 500.0f;
+    public static final float MAX_SPEED_MULTIPLIER = 5000.0f;
     public static final float MIN_CAMERA_MOVE_SPEED = 50.0f;
     public static final float MAX_CAMERA_MOVE_SPEED = 1000.0f;
     public static final float MIN_CAMERA_ZOOM = 0.05f;
     public static final float MAX_CAMERA_ZOOM = 5.0f;
+    public static final float MIN_CAMERA_SMOOTH_FACTOR = 0.1f;
+    public static final float MAX_CAMERA_SMOOTH_FACTOR = 1.0f;
     public static final float MIN_ZOOM_SENSITIVITY = 0.01f;
     public static final float MAX_ZOOM_SENSITIVITY = 0.5f;
     public static final int MIN_AUTO_SAVE_INTERVAL = 1;

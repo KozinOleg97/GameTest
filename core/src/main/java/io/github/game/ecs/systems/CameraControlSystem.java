@@ -27,6 +27,13 @@ public class CameraControlSystem extends EntitySystem {
     private final Vector3 cameraStart = new Vector3();
     private final Vector3 currentWorldCoords = new Vector3();
 
+    // Поля для интерполяции
+    private final Vector3 targetPosition = new Vector3();
+    private final Vector3 smoothVelocity = new Vector3();
+    private boolean useSmoothing = true;
+    private float targetZoom = 1.0f;
+    private float smoothZoomVelocity;
+
     // Флаг перетаскивания
     private boolean isDragging = false;
 
@@ -45,6 +52,9 @@ public class CameraControlSystem extends EntitySystem {
         this.inputService = inputService;
         this.graphicsSettings = graphicsSettings;
         this.cameraSettings = cameraSettings;
+
+        this.targetPosition.set(camera.position);
+        this.targetZoom = camera.zoom;
     }
 
     /**
@@ -58,6 +68,11 @@ public class CameraControlSystem extends EntitySystem {
         // Обрабатываем ввод только в режиме карты мира
         if (inputService.getCurrentMode() == InputMode.WORLD_MAP) {
             handleKeyboardInput(deltaTime);
+        }
+
+        // Применяем интерполяцию, если она включена
+        if (useSmoothing) {
+            applyCameraSmoothing(deltaTime);
         }
 
         // Всегда обновляем камеру (даже если не в режиме WORLD_MAP)
@@ -78,15 +93,9 @@ public class CameraControlSystem extends EntitySystem {
         if (inputService.getCurrentMode() != InputMode.WORLD_MAP || button != Input.Buttons.LEFT) {
             return false;
         }
-
         isDragging = true;
 
-        // Конвертируем экранные координаты в мировые
-        currentWorldCoords.set(screenX, screenY, 0);
-        camera.unproject(currentWorldCoords);
-
-        // Сохраняем начальные позиции
-        touchStart.set(currentWorldCoords.x, currentWorldCoords.y, 0);
+        touchStart.set(screenX, screenY, 0);
         cameraStart.set(camera.position);
 
         if (graphicsSettings.isDebugMode()) {
@@ -122,21 +131,16 @@ public class CameraControlSystem extends EntitySystem {
      */
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if (isDragging && inputService.getCurrentMode() == InputMode.WORLD_MAP) {
-            // Конвертируем экранные координаты в мировые
-            currentWorldCoords.set(screenX, screenY, 0);
-            camera.unproject(currentWorldCoords);
+            float deltaX = (screenX - touchStart.x) * targetZoom;
+            float deltaY = (touchStart.y - screenY) * targetZoom;
 
-            // Вычисляем смещение в мировых координатах
-            float deltaX = currentWorldCoords.x - touchStart.x;
-            float deltaY = currentWorldCoords.y - touchStart.y;
+            targetPosition.set(cameraStart.x - deltaX, cameraStart.y - deltaY, 0);
 
-            // Перемещаем камеру
-            camera.position.set(cameraStart.x - deltaX, cameraStart.y - deltaY, 0);
-
-            if (graphicsSettings.isDebugMode()) {
-                Gdx.app.log("CameraControlSystem",
-                            "Camera position: " + camera.position.x + ", " + camera.position.y);
+            // Если сглаживание отключено, применяем изменения сразу
+            if (!useSmoothing) {
+                camera.position.set(targetPosition);
             }
+
             return true;
         }
         return false;
@@ -155,12 +159,17 @@ public class CameraControlSystem extends EntitySystem {
             return false;
         }
 
-        // Используем настройки из GameSettings
-        float newZoom = camera.zoom - amountY * cameraSettings.getCameraZoomSensitivity();
-        camera.zoom = Math.max(
+        float newZoom = targetZoom - amountY * cameraSettings.getCameraZoomSensitivity();
+        targetZoom = Math.max(
             cameraSettings.getCameraMinZoom(),
             Math.min(cameraSettings.getCameraMaxZoom(), newZoom)
         );
+
+        // Если сглаживание отключено, применяем zoom сразу
+        if (!useSmoothing) {
+            camera.zoom = targetZoom;
+        }
+
         return true;
     }
 
@@ -172,33 +181,43 @@ public class CameraControlSystem extends EntitySystem {
     }
 
     /**
+     * Применяет сглаживание движения камеры с помощью интерполяции
+     */
+    private void applyCameraSmoothing(float deltaTime) {
+        // Используем линейную интерполяцию (LERP) для плавного перемещения
+        float smoothTime = cameraSettings.getCameraSmoothFactor(); // Например, 0.1f
+
+        camera.position.x += (targetPosition.x - camera.position.x) * smoothTime * deltaTime * 50;
+        camera.position.y += (targetPosition.y - camera.position.y) * smoothTime * deltaTime * 50;
+        camera.zoom += (targetZoom - camera.zoom) * smoothTime * deltaTime * 50;
+    }
+
+    /**
      * Обрабатывает клавиатурный ввод для перемещения камеры. Использует состояние кнопок из
      * InputService.
      *
      * @param deltaTime Время, прошедшее с последнего кадра
      */
     private void handleKeyboardInput(float deltaTime) {
-        // Используем настройки из GameSettings
         float moveAmount = cameraSettings.getCameraMoveSpeed() * deltaTime;
 
-        // Движение вправо
         if (inputService.isRightPressed()) {
-            camera.position.x += moveAmount / camera.zoom;
+            targetPosition.x += moveAmount / targetZoom;
         }
-
-        // Движение влево
         if (inputService.isLeftPressed()) {
-            camera.position.x -= moveAmount / camera.zoom;
+            targetPosition.x -= moveAmount / targetZoom;
         }
-
-        // Движение вверх
         if (inputService.isUpPressed()) {
-            camera.position.y += moveAmount / camera.zoom;
+            targetPosition.y += moveAmount / targetZoom;
+        }
+        if (inputService.isDownPressed()) {
+            targetPosition.y -= moveAmount / targetZoom;
         }
 
-        // Движение вниз
-        if (inputService.isDownPressed()) {
-            camera.position.y -= moveAmount / camera.zoom;
+        // Если сглаживание отключено, применяем изменения сразу
+        if (!useSmoothing) {
+            camera.position.set(targetPosition);
         }
     }
+
 }

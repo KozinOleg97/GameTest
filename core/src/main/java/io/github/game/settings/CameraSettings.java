@@ -20,4 +20,11 @@ public interface CameraSettings extends BaseSettings {
     float getCameraZoomSensitivity();
 
     void setCameraZoomSensitivity(float sensitivity);
+
+
+    float getCameraSmoothFactor();
+    void setCameraSmoothFactor(float smoothTime);
+
+    boolean isCameraSmoothingEnabled();
+    void setCameraSmoothingEnabled(boolean enabled);
 }

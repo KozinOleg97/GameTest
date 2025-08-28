@@ -247,6 +247,26 @@ public class SettingsFacade implements GraphicsSettings, AudioSettings,
         camera.setCameraZoomSensitivity(sensitivity);
     }
 
+    @Override
+    public float getCameraSmoothFactor() {
+        return camera.getCameraSmoothFactor();
+    }
+
+    @Override
+    public void setCameraSmoothFactor(float smoothTime) {
+        camera.setCameraSmoothFactor(smoothTime);
+    }
+
+    @Override
+    public boolean isCameraSmoothingEnabled() {
+        return camera.isCameraSmoothingEnabled();
+    }
+
+    @Override
+    public void setCameraSmoothingEnabled(boolean enabled) {
+        camera.setCameraSmoothingEnabled(enabled);
+    }
+
     // Реализация методов BaseSettings
     @Override
     public void load() {

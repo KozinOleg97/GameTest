@@ -11,6 +11,8 @@ public class CameraSettingsImpl extends BaseSettingsImpl implements CameraSettin
     private float cameraMinZoom;
     private float cameraMaxZoom;
     private float cameraZoomSensitivity;
+    private float cameraSmoothFactor;
+    private boolean isCameraSmoothingEnabled;
 
     public CameraSettingsImpl(Preferences prefs) {
         super(prefs, GameSettingsConstants.PREFIX_CAMERA);
@@ -27,6 +29,10 @@ public class CameraSettingsImpl extends BaseSettingsImpl implements CameraSettin
                                  GameSettingsConstants.DEFAULT_CAMERA_MAX_ZOOM);
         cameraZoomSensitivity = getFloat(GameSettingsConstants.KEY_CAMERA_ZOOM_SENSITIVITY,
                                          GameSettingsConstants.DEFAULT_CAMERA_ZOOM_SENSITIVITY);
+        cameraSmoothFactor = getFloat(GameSettingsConstants.KEY_CAMERA_SMOOTH_FACTOR,
+                                      GameSettingsConstants.DEFAULT_CAMERA_SMOOTH_FACTOR);
+        isCameraSmoothingEnabled = getBoolean(GameSettingsConstants.KEY_CAMERA_SMOOTHING_ENABLED,
+                                              GameSettingsConstants.DEFAULT_CAMERA_SMOOTHING_ENABLED);
     }
 
     @Override
@@ -101,5 +107,35 @@ public class CameraSettingsImpl extends BaseSettingsImpl implements CameraSettin
                                                    "Zoom sensitivity");
         putFloat(GameSettingsConstants.KEY_CAMERA_ZOOM_SENSITIVITY, this.cameraZoomSensitivity);
         save();
+    }
+
+    @Override
+    public float getCameraSmoothFactor() {
+        return cameraSmoothFactor;
+    }
+
+    @Override
+    public void setCameraSmoothFactor(float smoothTime) {
+        this.cameraSmoothFactor = validateFloat(smoothTime,
+                                                GameSettingsConstants.MIN_CAMERA_SMOOTH_FACTOR,
+                                                GameSettingsConstants.MAX_CAMERA_SMOOTH_FACTOR,
+                                                "Camera smooth factor");
+        putFloat(GameSettingsConstants.KEY_CAMERA_SMOOTH_FACTOR, this.cameraSmoothFactor);
+        save();
+
+    }
+
+    @Override
+    public boolean isCameraSmoothingEnabled() {
+        return isCameraSmoothingEnabled;
+    }
+
+    @Override
+    public void setCameraSmoothingEnabled(boolean enabled) {
+        this.isCameraSmoothingEnabled = enabled;
+        putBoolean(GameSettingsConstants.KEY_CAMERA_SMOOTHING_ENABLED,
+                   this.isCameraSmoothingEnabled);
+        save();
+
     }
 }

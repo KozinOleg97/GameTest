@@ -38,6 +38,7 @@ public class PerformanceMonitor implements Disposable {
     private long lastUpdateTime;
     // Расширенные метрики
     private boolean extendedStats = false;
+    private int fps_libGDX;
 
     @Inject
     public PerformanceMonitor(GraphicsSettings graphicsSettings,
@@ -92,6 +93,9 @@ public class PerformanceMonitor implements Disposable {
         int lineHeight = 20;
 
         font.draw(uiSpriteBatch, "FPS: " + fps, 20, yPosition);
+        yPosition -= lineHeight;
+
+        font.draw(uiSpriteBatch, "FPS_libGDX: " + fps_libGDX, 20, yPosition);
         yPosition -= lineHeight;
 
         font.draw(uiSpriteBatch, "Memory: " + MemoryUtils.getUsedMemoryMB() + "MB / " +
@@ -279,6 +283,8 @@ public class PerformanceMonitor implements Disposable {
         long elapsedTime = currentTime - lastUpdateTime;
         fps = (int) (updateInterval * 1000f / elapsedTime);
         lastUpdateTime = currentTime;
+
+        fps_libGDX = Gdx.graphics.getFramesPerSecond();
 
         // Обновление информации о памяти (используем MemoryUtils)
         // Память обновляется при каждом обращении через MemoryUtils

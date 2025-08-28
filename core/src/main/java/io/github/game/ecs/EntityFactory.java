@@ -28,7 +28,7 @@ public class EntityFactory {
         this.resourceManager = resourceManager;
     }
 
-    public void createPlayer(float x, float y) {
+    public Entity createPlayer(float x, float y) {
         Gdx.app.log("EntityFactory", "Creating player at position: " + x + ", " + y);
         Entity player = engine.createEntity();
 
@@ -55,9 +55,10 @@ public class EntityFactory {
 
         engine.addEntity(player);
         Gdx.app.log("EntityFactory", "Player entity created successfully");
+        return player;
     }
 
-    public void createNPC(float x, float y) {
+    public Entity createNPC(float x, float y) {
         Gdx.app.log("EntityFactory", "Creating NPC at position: " + x + ", " + y);
         Entity npc = engine.createEntity();
 
@@ -83,9 +84,10 @@ public class EntityFactory {
 
         engine.addEntity(npc);
         Gdx.app.log("EntityFactory", "NPC entity created successfully");
+        return npc;
     }
 
-    public void createHexEntity(Hex hex) {
+    public Entity createHexEntity(Hex hex) {
         Entity entity = engine.createEntity();
 
         HexComponent hexComp = engine.createComponent(HexComponent.class);
@@ -93,6 +95,8 @@ public class EntityFactory {
         entity.add(hexComp);
 
         engine.addEntity(entity);
+
+        return entity;
     }
 
     public void disposeEntity(Entity entity) {
