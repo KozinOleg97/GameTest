@@ -1,5 +1,6 @@
 package io.github.game.services;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import io.github.game.ecs.EntityFactory;
@@ -36,7 +37,8 @@ public class CharacterEntityService {
      */
     public void createPlayer(int x, int y) {
         if (!playerCreated) {
-            entityFactory.createPlayer(x, y);
+            Entity player = entityFactory.createPlayer(x, y);
+            engine.addEntity(player);
             playerCreated = true;
             Gdx.app.log("EntityManagement", "Player entity created at (" + x + ", " + y + ")");
         } else {
@@ -51,7 +53,8 @@ public class CharacterEntityService {
      * @param y координата Y для размещения NPC
      */
     public void createNPC(int x, int y) {
-        entityFactory.createNPC(x, y);
+        Entity npc = entityFactory.createNPC(x, y);
+        engine.addEntity(npc);
         Gdx.app.log("EntityManagement", "NPC entity created at (" + x + ", " + y + ")");
     }
 

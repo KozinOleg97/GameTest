@@ -11,7 +11,8 @@ import io.github.game.ecs.systems.MovementSystem;
 import io.github.game.ecs.systems.NPCLogicSystem;
 import io.github.game.ecs.systems.PlayerInputSystem;
 import io.github.game.ecs.systems.RenderingSystem;
-import io.github.game.ecs.systems.world.WorldSimulationSystem;
+import io.github.game.ecs.systems.world.HexSimulationSystem;
+import io.github.game.services.HexMapService;
 import io.github.game.services.InputService;
 import io.github.game.settings.CameraSettings;
 import io.github.game.settings.GameplaySettings;
@@ -30,8 +31,8 @@ public class ECSModule {
 
     @Provides
     @Singleton
-    WorldSimulationSystem provideWorldSimulationSystem() {
-        return new WorldSimulationSystem();
+    HexSimulationSystem provideWorldSimulationSystem(HexMapService hexMapService) {
+        return new HexSimulationSystem(hexMapService);
     }
 
     @Provides
@@ -62,7 +63,7 @@ public class ECSModule {
 
     @Provides
     @Singleton
-    PooledEngine providePooledEngine(WorldSimulationSystem worldSimulationSystem,
+    PooledEngine providePooledEngine(HexSimulationSystem hexSimulationSystem,
                                      PlayerInputSystem playerInputSystem,
                                      MovementSystem movementSystem,
                                      NPCLogicSystem npcLogicSystem,
@@ -73,7 +74,7 @@ public class ECSModule {
         PooledEngine engine = new PooledEngine();
 
         // Важно: системы обновления должны быть до системы рендеринга
-        engine.addSystem(worldSimulationSystem);
+        engine.addSystem(hexSimulationSystem);
         engine.addSystem(playerInputSystem);
         engine.addSystem(movementSystem);
         engine.addSystem(npcLogicSystem);

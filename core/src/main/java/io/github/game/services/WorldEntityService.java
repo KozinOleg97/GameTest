@@ -21,6 +21,8 @@ public class WorldEntityService {
     private final PooledEngine engine;
     private final HexMap hexMap;
     private final EntityFactory entityFactory;
+    private final HexMapService hexMapService;
+
     /**
      * Инициализирует игровой мир, создавая сущности для всех гексов
      */
@@ -29,10 +31,12 @@ public class WorldEntityService {
     private boolean hexEntitiesCreated = false;
 
     @Inject
-    public WorldEntityService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory) {
+    public WorldEntityService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory,
+                              HexMapService hexMapService) {
         this.engine = engine;
         this.hexMap = hexMap;
         this.entityFactory = entityFactory;
+        this.hexMapService = hexMapService;
     }
 
     /**
@@ -49,7 +53,13 @@ public class WorldEntityService {
         Gdx.app.log("WorldInit", "Creating entities for " + hexMap.size() + " hexes");
 
         // Создаем сущности для всех гексов на карте
-        hexMap.getHexes().values().forEach(entityFactory::createHexEntity);
+        hexMap.getHexes().values().forEach(hex -> {
+            Entity hexEntity = entityFactory.createHexEntity(hex);
+            engine.addEntity(hexEntity);
+
+            // Регистрируем сущность в HexMapService
+            hexMapService.registerHexEntity(hex.getCoordinates(), hexEntity);
+        });
         hexEntitiesCreated = true;
 
         Gdx.app.log("WorldInit", "Hex entities creation completed");

@@ -1,12 +1,25 @@
 package io.github.game.core.world.hex;
 
+import com.badlogic.ashley.core.Entity;
+import io.github.game.ecs.components.world.HexComponent;
+import io.github.game.services.HexMapService;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 
 /**
- * Утилитарный класс для математических операций с гексами
+ * Утилитарный класс для математических операций с гексами. Поддерживает как работу напрямую с
+ * объектами Hex, так и через HexMapService.
  */
 @UtilityClass
 public final class HexUtils {
+
+    /**
+     * Направления для шести соседних гексов в осевых координатах (q, r)
+     */
+    public static final HexCoordinates[] HEX_DIRECTIONS = {
+        new HexCoordinates(1, 0), new HexCoordinates(1, -1), new HexCoordinates(0, -1),
+        new HexCoordinates(-1, 0), new HexCoordinates(-1, 1), new HexCoordinates(0, 1)
+    };
 
     /**
      * Вычисляет расстояние между двумя гексами
@@ -31,9 +44,122 @@ public final class HexUtils {
     }
 
     /**
+     * Вычисляет расстояние между двумя сущностями гексов через HexMapService
+     */
+    public static int distance(Entity a, Entity b, HexMapService hexMapService) {
+        Optional<Hex> hexA = getHexFromEntity(a, hexMapService);
+        Optional<Hex> hexB = getHexFromEntity(b, hexMapService);
+
+        if (!hexA.isPresent() || !hexB.isPresent()) {
+            return Integer.MAX_VALUE;
+        }
+
+        return distance(hexA.get(), hexB.get());
+    }
+
+    /**
      * Проверяет, являются ли два гекса соседями
      */
     public static boolean areNeighbors(Hex a, Hex b) {
         return distance(a, b) == 1;
+    }
+
+    /**
+     * Проверяет, являются ли две сущности гексов соседями через HexMapService
+     */
+    public static boolean areNeighbors(Entity a, Entity b, HexMapService hexMapService) {
+        return distance(a, b, hexMapService) == 1;
+    }
+
+    /**
+     * Получает координаты из сущности гекса
+     */
+    public static Optional<HexCoordinates> getCoordinates(Entity entity) {
+        HexComponent comp = entity.getComponent(HexComponent.class);
+        if (comp == null) {
+            return Optional.empty();
+        }
+        return Optional.of(comp.getCoordinates());
+    }
+
+    /**
+     * Получает данные гекса из сущности через HexMapService
+     */
+    public static Optional<Hex> getHexFromEntity(Entity entity, HexMapService hexMapService) {
+        return getCoordinates(entity).flatMap(hexMapService::getHex);
+    }
+
+    /**
+     * Получает координаты соседа в заданном направлении
+     */
+    public static HexCoordinates getNeighborCoordinates(HexCoordinates coordinates, int direction) {
+        if (direction < 0 || direction >= 6) {
+            throw new IllegalArgumentException("Direction must be between 0 and 5");
+        }
+
+        HexCoordinates dir = HEX_DIRECTIONS[direction];
+        return new HexCoordinates(coordinates.getQ() + dir.getQ(), coordinates.getR() + dir.getR());
+    }
+
+    /**
+     * Получает координаты соседа в заданном направлении для сущности гекса
+     */
+    public static Optional<HexCoordinates> getNeighborCoordinates(Entity entity, int direction,
+                                                                  HexMapService hexMapService) {
+        return getCoordinates(entity).map(coords -> getNeighborCoordinates(coords, direction));
+    }
+
+    /**
+     * Находит все соседние координаты для заданных координат
+     */
+    public static HexCoordinates[] getAllNeighborCoordinates(HexCoordinates coordinates) {
+        HexCoordinates[] neighbors = new HexCoordinates[6];
+        for (int i = 0; i < 6; i++) {
+            neighbors[i] = getNeighborCoordinates(coordinates, i);
+        }
+        return neighbors;
+    }
+
+    /**
+     * Находит все соседние координаты для сущности гекса
+     */
+    public static Optional<HexCoordinates[]> getAllNeighborCoordinates(Entity entity,
+                                                                       HexMapService hexMapService) {
+        return getCoordinates(entity).map(HexUtils::getAllNeighborCoordinates);
+    }
+
+    /**
+     * Преобразует осевые координаты (q, r) в пиксельные координаты
+     */
+    public static float[] axialToPixel(HexCoordinates coordinates, float hexSize) {
+        float x = hexSize *
+                  (float) (Math.sqrt(3) * (coordinates.getQ() + 0.5 * (coordinates.getR() & 1)));
+        float y = hexSize * 1.5f * coordinates.getR();
+        return new float[]{x, y};
+    }
+
+    /**
+     * Преобразует осевые координаты сущности в пиксельные координаты
+     */
+    public static Optional<float[]> axialToPixel(Entity entity, float hexSize,
+                                                 HexMapService hexMapService) {
+        return getCoordinates(entity).map(coords -> axialToPixel(coords, hexSize));
+    }
+
+    /**
+     * Возвращает координаты всех шести соседних гексов
+     */
+    public static HexCoordinates[] getNeighborCoordinates(HexCoordinates coordinates) {
+        int q = coordinates.getQ();
+        int r = coordinates.getR();
+
+        return new HexCoordinates[]{
+            new HexCoordinates(q + 1, r),      // Восток
+            new HexCoordinates(q + 1, r - 1),  // Северо-восток
+            new HexCoordinates(q, r - 1),      // Северо-запад
+            new HexCoordinates(q - 1, r),      // Запад
+            new HexCoordinates(q - 1, r + 1),  // Юго-запад
+            new HexCoordinates(q, r + 1)       // Юго-восток
+        };
     }
 }

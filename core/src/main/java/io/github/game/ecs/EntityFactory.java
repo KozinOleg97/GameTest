@@ -53,7 +53,6 @@ public class EntityFactory {
         render.setSprite(playerSprite);
         player.add(render);
 
-        engine.addEntity(player);
         Gdx.app.log("EntityFactory", "Player entity created successfully");
         return player;
     }
@@ -82,7 +81,6 @@ public class EntityFactory {
         render.setSprite(npcSprite);
         npc.add(render);
 
-        engine.addEntity(npc);
         Gdx.app.log("EntityFactory", "NPC entity created successfully");
         return npc;
     }
@@ -91,16 +89,10 @@ public class EntityFactory {
         Entity entity = engine.createEntity();
 
         HexComponent hexComp = engine.createComponent(HexComponent.class);
-        hexComp.setHex(hex);
+        hexComp.setCoordinates(hex.getCoordinates());
         entity.add(hexComp);
-
-        engine.addEntity(entity);
 
         return entity;
     }
 
-    public void disposeEntity(Entity entity) {
-        // Удаляем сущность из движка
-        engine.removeEntity(entity);
-    }
 }
