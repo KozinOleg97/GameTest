@@ -3,7 +3,7 @@ package io.github.game.di.modules;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.core.world.HexMap;
-import io.github.game.core.world.generator.AdvancedWorldGenerator;
+import io.github.game.core.world.generator.ProceduralWorldGenerator;
 import io.github.game.core.world.generator.WorldGenerator;
 import javax.inject.Singleton;
 
@@ -24,7 +24,7 @@ public class WorldModule {
         // Параметры генерации можно вынести в конфигурацию
 //        return new RectangularWorldGenerator(-5, -5, 100, 100, HexType.PLAINS);
 
-        return new AdvancedWorldGenerator(200, 200, 123452222);
+        return new ProceduralWorldGenerator(200, 200, 123452222);
     }
 
     /**

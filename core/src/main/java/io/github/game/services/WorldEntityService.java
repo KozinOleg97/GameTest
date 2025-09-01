@@ -21,13 +21,12 @@ public class WorldEntityService {
     private final PooledEngine engine;
     private final HexMap hexMap;
     private final EntityFactory entityFactory;
-    @Getter
-    private boolean hexEntitiesCreated = false;
-
     /**
      * Инициализирует игровой мир, создавая сущности для всех гексов
      */
     private final boolean playerCreated = false;
+    @Getter
+    private boolean hexEntitiesCreated = false;
 
     @Inject
     public WorldEntityService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory) {

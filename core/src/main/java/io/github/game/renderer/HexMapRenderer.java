@@ -89,7 +89,7 @@ public class HexMapRenderer {
             case FOREST -> shapeRenderer.setColor(0.2f, 0.6f, 0.1f, 1);
             case MOUNTAINS -> shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
             case OCEAN -> shapeRenderer.setColor(0.2f, 0.4f, 0.8f, 1);
-            case COAST -> shapeRenderer.setColor(0.6f, 0.4f, 0.2f, 1);
+            case COAST -> shapeRenderer.setColor(0.8f, 0.8f, 0.6f, 1);
             case DESERT -> shapeRenderer.setColor(0.95f, 0.9f, 0.11f, 1);
             case SWAMP -> shapeRenderer.setColor(0.1f, 0.2f, 0.1f, 1);
             default -> shapeRenderer.setColor(0.9f, 0.1f, 0.9f, 1); // Розовый по умолчанию

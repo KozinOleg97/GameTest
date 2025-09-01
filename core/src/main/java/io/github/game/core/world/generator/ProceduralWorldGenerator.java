@@ -7,10 +7,10 @@ import io.github.game.core.world.hex.HexType;
 import java.util.Random;
 
 /**
- * Продвинутый генератор мира с использованием многоуровневого шума Перлина. Использует комбинированный подход с
- * континентальным и климатическим моделированием.
+ * Продвинутый генератор мира с использованием многоуровневого шума Перлина. Использует
+ * комбинированный подход с континентальным и климатическим моделированием.
  */
-public class AdvancedWorldGenerator implements WorldGenerator {
+public class ProceduralWorldGenerator implements WorldGenerator {
 
     private final int width;
     private final int height;
@@ -30,7 +30,7 @@ public class AdvancedWorldGenerator implements WorldGenerator {
      * @param height высота мира в гексах
      * @param seed   seed для генерации
      */
-    public AdvancedWorldGenerator(int width, int height, long seed) {
+    public ProceduralWorldGenerator(int width, int height, long seed) {
         this.width = width;
         this.height = height;
         this.seed = seed;
@@ -186,8 +186,15 @@ public class AdvancedWorldGenerator implements WorldGenerator {
         mountainValue = (mountainValue + 1.0f) / 2.0f;
         mountainValue = (float) Math.pow(mountainValue, 2.2f); // Усиливаем пики
 
+        float plateNoise = continentalNoise.noise(nx * 0.3f, ny * 0.3f);
+        plateNoise = (plateNoise + 1.0f) / 2.0f;
+
+        float mountainRidge = mountainNoise.noise(nx * 8, ny * 8);
+        mountainRidge = (float) Math.pow(mountainRidge, 3); // Создать более выраженные хребты
+
         // Комбинируем все шумы
-        float heightValue = continentalValue * 0.5f + terrainValue * 0.3f + mountainValue * 0.2f;
+        float heightValue = continentalValue * 0.5f + terrainValue * 0.3f + mountainValue * 0.2f +
+                            plateNoise * 0.1f + mountainRidge * 0.15f;
 
         // Усиливаем контраст для создания более выраженного рельефа
         heightValue = (float) Math.pow(heightValue, 1.3f);
