@@ -28,7 +28,7 @@ public class HexSimulationSystem extends IteratingSystem {
 
         // Здесь будет логика обновления конкретного гекса
         // Например: рост ресурсов, распространение влияния фракций и т.д.
-        simulateHex(hexMapService.getHex(hexComp.getCoordinates()).get(), deltaTime);
+        simulateHex(hexMapService.getHex(hexComp.getCoordinates()), deltaTime);
     }
 
     private void simulateHex(Hex hex, float deltaTime) {

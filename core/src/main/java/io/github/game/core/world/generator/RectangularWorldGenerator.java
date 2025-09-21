@@ -40,7 +40,7 @@ public class RectangularWorldGenerator implements WorldGenerator {
      */
     @Override
     public HexMap generateWorld() {
-        HexMap map = new HexMap();
+        HexMap map = new HexMap(width, height);
         for (int q = startQ; q < startQ + width; q++) {
             for (int r = startR; r < startR + height; r++) {
                 // Создаем гекс и добавляем его на карту

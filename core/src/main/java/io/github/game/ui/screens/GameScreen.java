@@ -24,6 +24,7 @@ public class GameScreen implements Screen {
     private final EntityFactory entityFactory;
     private final WorldEntityService worldEntityService;
     private final HexMapRenderer hexMapRenderer;
+
     private final InputManager inputManager;
     private final Viewport viewport;
     private final CharacterEntityService characterEntityService;
@@ -59,7 +60,7 @@ public class GameScreen implements Screen {
         // Создание игрока и NPC через отдельный сервис
         characterEntityService.createPlayer(100, 100);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             characterEntityService.createNPC(random.nextInt(1000), random.nextInt(1000));
         }
 
@@ -69,10 +70,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         // Обновляем мониторинг производительности
-        performanceMonitor.update(delta);
-
-        // Начинаем измерение времени рендеринга
-        performanceMonitor.startEvent("frame_render");
+        performanceMonitor.update();
 
         //----------------Рендер-----------------------------------
 
@@ -93,14 +91,10 @@ public class GameScreen implements Screen {
 
         //----------------------------------------------------------
 
-        // Завершаем измерение времени рендеринга кадра
-        float frameTime = performanceMonitor.endEvent("frame_render");
-        performanceMonitor.addCustomMetric("Frame Time", String.format("%.2fms", frameTime));
-
         // Рендерим статистику производительности поверх всего
         performanceMonitor.render();
 
-        if (Gdx.graphics.getFrameId() % 60 == 0) { // Каждую секунду при 60 FPS
+        if (Gdx.graphics.getFrameId() % 60 == 0) {
             PerformanceLogger.logMemoryUsage("During rendering");
 
             if (MemoryUtils.isMemoryCritical()) {

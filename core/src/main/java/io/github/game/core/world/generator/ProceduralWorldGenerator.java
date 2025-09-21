@@ -5,6 +5,10 @@ import io.github.game.core.world.HexMap;
 import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexType;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 /**
  * Продвинутый генератор мира с использованием многоуровневого шума Перлина. Использует
@@ -45,7 +49,8 @@ public class ProceduralWorldGenerator implements WorldGenerator {
 
     @Override
     public HexMap generateWorld() {
-        HexMap map = new HexMap();
+        // Создаем карту с указанием размеров
+        HexMap map = new HexMap(width, height);
 
         int[] typeCounts = new int[HexType.values().length];
         int totalCount = 0;
@@ -58,7 +63,7 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         float minTemperature = Float.MAX_VALUE;
         float maxTemperature = Float.MIN_VALUE;
         float minAridity = Float.MAX_VALUE;
-        float maxAridity = Float.MIN_VALUE;
+        float maxAridity = Float.MAX_VALUE;
 
         // Генерируем базовые карты шума
         float[][] heightMap = new float[width][height];
@@ -67,25 +72,39 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         float[][] aridityMap = new float[width][height];
 
         // Сначала генерируем все значения
-        for (int q = 0; q < width; q++) {
-            for (int r = 0; r < height; r++) {
-                // Нормализованные координаты для шума
-                float nx = (float) q / width;
-                float ny = (float) r / height;
+        IntStream.range(0, width)
+                 .parallel()
+                 .forEach(q -> {
+                     for (int r = 0; r < height; r++) {
+                         // Нормализованные координаты для шума
+                         float nx = (float) q / width;
+                         float ny = (float) r / height;
 
-                // Генерируем базовые значения
-                heightMap[q][r] = generateHeightValue(nx, ny);
-                moistureMap[q][r] = generateMoistureValue(nx, ny);
-                temperatureMap[q][r] = generateTemperatureValue(nx, ny);
-                aridityMap[q][r] = generateAridityValue(nx, ny);
-            }
-        }
+                         // Генерируем базовые значения
+                         heightMap[q][r] = generateHeightValue(nx, ny);
+                         moistureMap[q][r] = generateMoistureValue(nx, ny);
+                         temperatureMap[q][r] = generateTemperatureValue(nx, ny);
+                         aridityMap[q][r] = generateAridityValue(nx, ny);
+                     }
+                 });
+
+        long startTime = System.currentTimeMillis();
 
         // Нормализуем карты для получения полного диапазона [0, 1]
-        normalizeMap(heightMap);
-        normalizeMap(moistureMap);
-        normalizeMap(temperatureMap);
-        normalizeMap(aridityMap);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        CompletableFuture[] futures = new CompletableFuture[]{
+            CompletableFuture.runAsync(() -> normalizeMap(heightMap), executorService),
+            CompletableFuture.runAsync(() -> normalizeMap(moistureMap), executorService),
+            CompletableFuture.runAsync(() -> normalizeMap(temperatureMap), executorService),
+            CompletableFuture.runAsync(() -> normalizeMap(aridityMap), executorService)
+        };
+        CompletableFuture.allOf(futures).join();
+        executorService.shutdown();
+
+        long duration = System.currentTimeMillis() - startTime;
+
+        Gdx.app.log("Custom", "Hex entities creation completed " +
+                              duration);
 
         // Теперь создаем гексы
         for (int q = 0; q < width; q++) {
@@ -98,6 +117,7 @@ public class ProceduralWorldGenerator implements WorldGenerator {
                 float aridityValue = aridityMap[q][r];
 
                 // Обновляем статистику
+
                 minHeight = Math.min(minHeight, heightValue);
                 maxHeight = Math.max(maxHeight, heightValue);
                 minMoisture = Math.min(minMoisture, moistureValue);
@@ -118,7 +138,14 @@ public class ProceduralWorldGenerator implements WorldGenerator {
                 hex.setGenerationSeed(
                     (long) (heightValue * 1000 + moistureValue * 100 + temperatureValue * 10 +
                             aridityValue * 1));
-                map.addHex(hex);
+
+                // Добавляем гекс на карту
+                try {
+                    map.addHex(hex);
+                } catch (IllegalArgumentException e) {
+                    Gdx.app.error("Generation",
+                                  "Failed to add hex at (" + q + ", " + r + "): " + e.getMessage());
+                }
             }
         }
 
@@ -196,7 +223,7 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         float heightValue = continentalValue * 0.5f + terrainValue * 0.3f + mountainValue * 0.2f +
                             plateNoise * 0.1f + mountainRidge * 0.15f;
 
-        // Усиливаем контраст для создания более выраженного рельефа
+        // Усиливаем контраст для создания более выраженного рельеф
         heightValue = (float) Math.pow(heightValue, 1.3f);
 
         return heightValue;

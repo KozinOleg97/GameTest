@@ -3,7 +3,6 @@ package io.github.game.monitoring;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.game.settings.GraphicsSettings;
@@ -27,18 +26,24 @@ public class PerformanceMonitor implements Disposable {
 
 
     private final BitmapFont font;
-    private final Array<Float> frameTimes;
-    private final int updateInterval = 60; // Обновлять статистику каждые 60 кадров
+
+    private final float[] frameTimes;
+    private final int frameArraySize;
+    private final int updateInterval = 120;
     private final Map<String, String> customMetrics = new HashMap<>();
     private final Map<String, Long> events = new HashMap<>();
     private final Map<String, Float> eventDurations = new HashMap<>();
+    private float frameTimeValue;
+    private int frameArrayIndex;
+    private boolean frameArrayFullFlag;
     // Статистика производительности
-    private int fps;
+
     private long frameCounter;
     private long lastUpdateTime;
     // Расширенные метрики
-    private boolean extendedStats = false;
+    private boolean extendedStats = true;
     private int fps_libGDX;
+    private float perf_libGDX;
 
     @Inject
     public PerformanceMonitor(GraphicsSettings graphicsSettings,
@@ -50,7 +55,11 @@ public class PerformanceMonitor implements Disposable {
         this.uiViewport = uiViewport;
         this.font = font;
 
-        this.frameTimes = new Array<>();
+        this.frameTimeValue = 0;
+        this.frameArrayIndex = 0;
+        this.frameArraySize = 500;
+        this.frameArrayFullFlag = false;
+        this.frameTimes = new float[frameArraySize];
         this.lastUpdateTime = System.currentTimeMillis();
 
         Gdx.app.log("PerformanceMonitor", "Performance monitor initialized");
@@ -58,14 +67,20 @@ public class PerformanceMonitor implements Disposable {
 
     /**
      * Обновляет статистику производительности. Должен вызываться каждый кадр в методе render.
-     *
-     * @param deltaTime время since последнего кадра
      */
-    public void update(float deltaTime) {
-        frameCounter++;
-
+    public void update() {
         // Добавляем время кадра для расчета среднего FPS
-        frameTimes.add(deltaTime);
+
+        frameTimes[frameArrayIndex] = Gdx.graphics.getDeltaTime();
+        frameTimeValue += Gdx.graphics.getDeltaTime();
+        frameTimeValue -= frameTimes[frameArrayIndex];
+
+        if (frameArrayIndex < frameArraySize - 1) {
+            frameArrayIndex++;
+        } else {
+            frameArrayIndex = 0;
+            frameArrayFullFlag = true;
+        }
 
         // Обновляем статистику с заданным интервалом
         if (frameCounter % updateInterval == 0) {
@@ -92,10 +107,12 @@ public class PerformanceMonitor implements Disposable {
         int yPosition = (int) (uiViewport.getWorldHeight() - 20);
         int lineHeight = 20;
 
-        font.draw(uiSpriteBatch, "FPS: " + fps, 20, yPosition);
+        font.draw(uiSpriteBatch, "FPS_libGDX: " + fps_libGDX, 20, yPosition);
         yPosition -= lineHeight;
 
-        font.draw(uiSpriteBatch, "FPS_libGDX: " + fps_libGDX, 20, yPosition);
+        font.draw(uiSpriteBatch,
+                  "PerformanceCounter: " + String.format("%.2f ms", perf_libGDX * 1000), 20,
+                  yPosition);
         yPosition -= lineHeight;
 
         font.draw(uiSpriteBatch, "Memory: " + MemoryUtils.getUsedMemoryMB() + "MB / " +
@@ -104,12 +121,13 @@ public class PerformanceMonitor implements Disposable {
                   20, yPosition);
         yPosition -= lineHeight;
 
-        font.draw(uiSpriteBatch, "Max Memory: " + MemoryUtils.getMaxMemoryMB() + "MB", 20,
+        font.draw(uiSpriteBatch, "Max Memory: %dMB".formatted(MemoryUtils.getMaxMemoryMB()), 20,
                   yPosition);
         yPosition -= lineHeight;
 
         // Дополнительная статистика
-        font.draw(uiSpriteBatch, "Frame Time: " + getAverageFrameTime() + "ms", 20, yPosition);
+        font.draw(uiSpriteBatch, "Frame Time: " + String.format("%.2f ms", getAverageFrameTime()),
+                  20, yPosition);
         yPosition -= lineHeight;
 
         // Расширенная статистика (если включена)
@@ -198,7 +216,7 @@ public class PerformanceMonitor implements Disposable {
      * @return текущий FPS
      */
     public int getFps() {
-        return fps;
+        return Gdx.graphics.getFramesPerSecond();
     }
 
     /**
@@ -237,6 +255,8 @@ public class PerformanceMonitor implements Disposable {
     public int getEntityCount() {
         // TODO: Реализовать получение количества сущностей из ECS движка
         // Временная заглушка
+
+
         return 0;
     }
 
@@ -246,15 +266,14 @@ public class PerformanceMonitor implements Disposable {
      * @return среднее время кадра
      */
     public float getAverageFrameTime() {
-        if (frameTimes.size == 0) {
-            return 0;
-        }
 
-        float total = 0;
-        for (float time : frameTimes) {
-            total += time;
+        float sum = 0;
+        for (float frameTime : frameTimes) {
+            sum += frameTime;
         }
-        return (total / frameTimes.size) * 1000; // Convert to milliseconds
+        float average = sum / frameTimes.length;
+
+        return average * 1000; // Convert to milliseconds
     }
 
     /**
@@ -267,7 +286,7 @@ public class PerformanceMonitor implements Disposable {
     @Override
     public void dispose() {
         // Очищаем ресурсы
-        frameTimes.clear();
+
         customMetrics.clear();
         events.clear();
         eventDurations.clear();
@@ -278,11 +297,6 @@ public class PerformanceMonitor implements Disposable {
      * Обновляет статистику производительности.
      */
     private void updatePerformanceStats() {
-        // Расчет FPS
-        long currentTime = System.currentTimeMillis();
-        long elapsedTime = currentTime - lastUpdateTime;
-        fps = (int) (updateInterval * 1000f / elapsedTime);
-        lastUpdateTime = currentTime;
 
         fps_libGDX = Gdx.graphics.getFramesPerSecond();
 

@@ -1,10 +1,12 @@
 package io.github.game.di.modules;
 
+import com.badlogic.gdx.Gdx;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.core.world.HexMap;
 import io.github.game.core.world.generator.ProceduralWorldGenerator;
 import io.github.game.core.world.generator.WorldGenerator;
+import io.github.game.settings.GameplaySettings;
 import javax.inject.Singleton;
 
 /**
@@ -20,11 +22,11 @@ public class WorldModule {
      */
     @Provides
     @Singleton
-    public WorldGenerator provideWorldGenerator() {
+    public WorldGenerator provideWorldGenerator(GameplaySettings settings) {
         // Параметры генерации можно вынести в конфигурацию
 //        return new RectangularWorldGenerator(-5, -5, 100, 100, HexType.PLAINS);
 
-        return new ProceduralWorldGenerator(200, 200, 123452222);
+        return new ProceduralWorldGenerator(settings.getHexSize(), settings.getHexSize(), 5050);
     }
 
     /**
@@ -36,6 +38,14 @@ public class WorldModule {
     @Provides
     @Singleton
     public HexMap provideHexMap(WorldGenerator worldGenerator) {
-        return worldGenerator.generateWorld();
+
+        long startTime = System.currentTimeMillis();
+
+        HexMap hexMap = worldGenerator.generateWorld();
+
+        long duration = System.currentTimeMillis() - startTime;
+        Gdx.app.log("WorldInit", "Hex entities creation completed " + duration + " mils");
+
+        return hexMap;
     }
 }

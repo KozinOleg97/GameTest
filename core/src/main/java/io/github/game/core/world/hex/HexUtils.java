@@ -47,14 +47,12 @@ public final class HexUtils {
      * Вычисляет расстояние между двумя сущностями гексов через HexMapService
      */
     public static int distance(Entity a, Entity b, HexMapService hexMapService) {
-        Optional<Hex> hexA = getHexFromEntity(a, hexMapService);
-        Optional<Hex> hexB = getHexFromEntity(b, hexMapService);
+        Hex hexA = getHexFromEntity(a, hexMapService);
+        Hex hexB = getHexFromEntity(b, hexMapService);
 
-        if (!hexA.isPresent() || !hexB.isPresent()) {
-            return Integer.MAX_VALUE;
-        }
 
-        return distance(hexA.get(), hexB.get());
+
+        return distance(hexA, hexB);
     }
 
     /**
@@ -74,19 +72,18 @@ public final class HexUtils {
     /**
      * Получает координаты из сущности гекса
      */
-    public static Optional<HexCoordinates> getCoordinates(Entity entity) {
+    public static HexCoordinates getCoordinates(Entity entity) {
         HexComponent comp = entity.getComponent(HexComponent.class);
-        if (comp == null) {
-            return Optional.empty();
-        }
-        return Optional.of(comp.getCoordinates());
+        return comp.getCoordinates();
     }
 
     /**
      * Получает данные гекса из сущности через HexMapService
      */
-    public static Optional<Hex> getHexFromEntity(Entity entity, HexMapService hexMapService) {
-        return getCoordinates(entity).flatMap(hexMapService::getHex);
+    public static Hex getHexFromEntity(Entity entity, HexMapService hexMapService) {
+
+        return hexMapService.getHex(getCoordinates(entity));
+
     }
 
     /**
@@ -104,9 +101,10 @@ public final class HexUtils {
     /**
      * Получает координаты соседа в заданном направлении для сущности гекса
      */
-    public static Optional<HexCoordinates> getNeighborCoordinates(Entity entity, int direction,
-                                                                  HexMapService hexMapService) {
-        return getCoordinates(entity).map(coords -> getNeighborCoordinates(coords, direction));
+    public static HexCoordinates getNeighborCoordinates(Entity entity, int direction,
+                                                        HexMapService hexMapService) {
+
+        return getNeighborCoordinates(getCoordinates(entity), direction);
     }
 
     /**
@@ -123,9 +121,9 @@ public final class HexUtils {
     /**
      * Находит все соседние координаты для сущности гекса
      */
-    public static Optional<HexCoordinates[]> getAllNeighborCoordinates(Entity entity,
-                                                                       HexMapService hexMapService) {
-        return getCoordinates(entity).map(HexUtils::getAllNeighborCoordinates);
+    public static HexCoordinates[] getAllNeighborCoordinates(Entity entity,
+                                                             HexMapService hexMapService) {
+        return HexUtils.getAllNeighborCoordinates(getCoordinates(entity));
     }
 
     /**
@@ -141,9 +139,9 @@ public final class HexUtils {
     /**
      * Преобразует осевые координаты сущности в пиксельные координаты
      */
-    public static Optional<float[]> axialToPixel(Entity entity, float hexSize,
-                                                 HexMapService hexMapService) {
-        return getCoordinates(entity).map(coords -> axialToPixel(coords, hexSize));
+    public static float[] axialToPixel(Entity entity, float hexSize,
+                                       HexMapService hexMapService) {
+        return axialToPixel(getCoordinates(entity), hexSize);
     }
 
     /**

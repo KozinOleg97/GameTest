@@ -53,17 +53,16 @@ public class WorldEntityService {
         Gdx.app.log("WorldInit", "Creating entities for " + hexMap.size() + " hexes");
 
         // Создаем сущности для всех гексов на карте
-        hexMap.getHexes().values().forEach(hex -> {
+        hexMap.getHexes().forEach(hex -> {
             Entity hexEntity = entityFactory.createHexEntity(hex);
             engine.addEntity(hexEntity);
 
-            // Регистрируем сущность в HexMapService
+//             Регистрируем сущность в HexMapService
             hexMapService.registerHexEntity(hex.getCoordinates(), hexEntity);
         });
         hexEntitiesCreated = true;
 
-        Gdx.app.log("WorldInit", "Hex entities creation completed");
-        MemoryUtils.logMemoryUsage("After hex entities creation");
+        MemoryUtils.logMemoryUsage("After hex entities creation ");
     }
 
     /**

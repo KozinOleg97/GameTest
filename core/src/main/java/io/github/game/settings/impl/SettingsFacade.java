@@ -206,6 +206,16 @@ public class SettingsFacade implements GraphicsSettings, AudioSettings,
         gameplay.setAutoSaveInterval(minutes);
     }
 
+    @Override
+    public int getHexSize() {
+        return gameplay.getHexSize();
+    }
+
+    @Override
+    public void setHexSize(int size) {
+        gameplay.setHexSize(size);
+    }
+
     // Делегирование методов CameraSettings
     @Override
     public float getCameraMoveSpeed() {

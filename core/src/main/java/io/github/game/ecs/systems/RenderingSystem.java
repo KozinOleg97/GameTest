@@ -12,8 +12,10 @@ import io.github.game.ecs.components.RenderComponent;
 
 public class RenderingSystem extends IteratingSystem {
 
-    private final ComponentMapper<PositionComponent> positionMapper;
-    private final ComponentMapper<RenderComponent> renderMapper;
+    private final ComponentMapper<PositionComponent> positionMapper = ComponentMapper.getFor(
+        PositionComponent.class);
+    private final ComponentMapper<RenderComponent> renderMapper = ComponentMapper.getFor(
+        RenderComponent.class);
 
     private final SpriteBatch batch;
     private final OrthographicCamera camera;
@@ -22,8 +24,6 @@ public class RenderingSystem extends IteratingSystem {
         super(Family.all(PositionComponent.class, RenderComponent.class).get());
         this.batch = batch;
         this.camera = camera;
-        this.positionMapper = ComponentMapper.getFor(PositionComponent.class);
-        this.renderMapper = ComponentMapper.getFor(RenderComponent.class);
     }
 
     @Override

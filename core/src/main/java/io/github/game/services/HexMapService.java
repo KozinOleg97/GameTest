@@ -42,7 +42,7 @@ public class HexMapService {
     /**
      * Получает данные гекса по координатам
      */
-    public Optional<Hex> getHex(HexCoordinates coordinates) {
+    public Hex getHex(HexCoordinates coordinates) {
         return hexMap.getHex(coordinates);
     }
 

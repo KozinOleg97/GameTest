@@ -22,4 +22,8 @@ public interface GameplaySettings extends BaseSettings {
     int getAutoSaveInterval();
 
     void setAutoSaveInterval(int minutes);
+
+    int getHexSize();
+
+    void setHexSize(int size);
 }

@@ -1,16 +1,15 @@
 package io.github.game.utils;
 
 import com.badlogic.gdx.Gdx;
+import lombok.experimental.UtilityClass;
 
 /**
  * Утилита для работы с памятью и мониторинга использования памяти. Предоставляет методы для
  * получения информации о памяти и логирования.
  */
+@UtilityClass
 public final class MemoryUtils {
 
-    private MemoryUtils() {
-        // Запрещаем создание экземпляров утилитного класса
-    }
 
     /**
      * Логирует текущее использование памяти с указанным контекстом.

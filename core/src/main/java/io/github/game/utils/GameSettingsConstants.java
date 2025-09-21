@@ -33,6 +33,7 @@ public final class GameSettingsConstants {
     public static final String KEY_DIFFICULTY = "difficulty";
     public static final String KEY_AUTO_SAVE = "autoSaveEnabled";
     public static final String KEY_AUTO_SAVE_INTERVAL = "autoSaveInterval";
+    public static final String KEY_HEX_SIZE_DEBUG = "hexSize";
 
     // Ключи для настроек камеры
     public static final String KEY_CAMERA_MOVE_SPEED = "cameraMoveSpeed";
@@ -61,6 +62,7 @@ public final class GameSettingsConstants {
     public static final String DEFAULT_DIFFICULTY = "NORMAL";
     public static final boolean DEFAULT_AUTO_SAVE = true;
     public static final int DEFAULT_AUTO_SAVE_INTERVAL = 5;
+    public static final int DEFAULT_HEX_SIZE = 200;
 
     // Значения по умолчанию для настроек камеры
     public static final float DEFAULT_CAMERA_MOVE_SPEED = 300.0f;

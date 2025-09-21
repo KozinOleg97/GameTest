@@ -11,6 +11,7 @@ public class GameplaySettingsImpl extends BaseSettingsImpl implements GameplaySe
     private String difficulty;
     private boolean autoSaveEnabled;
     private int autoSaveInterval;
+    private int hexSize;
 
     public GameplaySettingsImpl(Preferences prefs) {
         super(prefs, GameSettingsConstants.PREFIX_GAMEPLAY);
@@ -27,6 +28,8 @@ public class GameplaySettingsImpl extends BaseSettingsImpl implements GameplaySe
                                      GameSettingsConstants.DEFAULT_AUTO_SAVE);
         autoSaveInterval = getInt(GameSettingsConstants.KEY_AUTO_SAVE_INTERVAL,
                                   GameSettingsConstants.DEFAULT_AUTO_SAVE_INTERVAL);
+        hexSize = getInt(GameSettingsConstants.KEY_HEX_SIZE_DEBUG,
+                         GameSettingsConstants.DEFAULT_HEX_SIZE);
     }
 
     @Override
@@ -90,5 +93,19 @@ public class GameplaySettingsImpl extends BaseSettingsImpl implements GameplaySe
                                             "Auto-save interval");
         putInt(GameSettingsConstants.KEY_AUTO_SAVE_INTERVAL, this.autoSaveInterval);
         save();
+    }
+
+    @Override
+    public int getHexSize() {
+        return this.hexSize;
+    }
+
+    @Override
+    public void setHexSize(int size) {
+        this.hexSize = validateInt(size, 1, 10000, "Hex map size");
+
+        putInt(GameSettingsConstants.KEY_HEX_SIZE_DEBUG, this.hexSize);
+        save();
+
     }
 }
