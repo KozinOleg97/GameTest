@@ -5,13 +5,11 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import io.github.game.core.world.hex.Hex;
 import io.github.game.ecs.components.PositionComponent;
 import io.github.game.ecs.components.RenderComponent;
 import io.github.game.ecs.components.VelocityComponent;
 import io.github.game.ecs.components.tags.NPCComponent;
 import io.github.game.ecs.components.tags.PlayerComponent;
-import io.github.game.ecs.components.world.HexComponent;
 import io.github.game.utils.ResourceManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -83,16 +81,6 @@ public class EntityFactory {
 
         Gdx.app.log("EntityFactory", "NPC entity created successfully");
         return npc;
-    }
-
-    public Entity createHexEntity(Hex hex) {
-        Entity entity = engine.createEntity();
-
-        HexComponent hexComp = engine.createComponent(HexComponent.class);
-        hexComp.setCoordinates(hex.getCoordinates());
-        entity.add(hexComp);
-
-        return entity;
     }
 
 }

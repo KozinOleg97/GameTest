@@ -1,6 +1,7 @@
 package io.github.game.utils;
 
 import com.badlogic.gdx.Gdx;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -10,6 +11,17 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class MemoryUtils {
 
+    @Getter
+    private static int ECSEntityCount = 0;
+
+
+    public static void EntityAdded() {
+        ECSEntityCount++;
+    }
+
+    public static void EntityRemoved() {
+        ECSEntityCount--;
+    }
 
     /**
      * Логирует текущее использование памяти с указанным контекстом.

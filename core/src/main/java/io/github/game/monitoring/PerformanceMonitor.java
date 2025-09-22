@@ -71,13 +71,12 @@ public class PerformanceMonitor implements Disposable {
     public void update() {
         // Добавляем время кадра для расчета среднего FPS
 
+        frameTimeValue -= frameTimes[frameArrayIndex];
         frameTimes[frameArrayIndex] = Gdx.graphics.getDeltaTime();
         frameTimeValue += Gdx.graphics.getDeltaTime();
-        frameTimeValue -= frameTimes[frameArrayIndex];
 
-        if (frameArrayIndex < frameArraySize - 1) {
-            frameArrayIndex++;
-        } else {
+        frameArrayIndex++;
+        if (frameArrayIndex >= frameArraySize) {
             frameArrayIndex = 0;
             frameArrayFullFlag = true;
         }
@@ -126,7 +125,8 @@ public class PerformanceMonitor implements Disposable {
         yPosition -= lineHeight;
 
         // Дополнительная статистика
-        font.draw(uiSpriteBatch, "Frame Time: " + String.format("%.2f ms", getAverageFrameTime()),
+        font.draw(uiSpriteBatch,
+                  "Frame Time: " + String.format("%.3f ms", getAverageFrameTime() * 1000),
                   20, yPosition);
         yPosition -= lineHeight;
 
@@ -256,8 +256,7 @@ public class PerformanceMonitor implements Disposable {
         // TODO: Реализовать получение количества сущностей из ECS движка
         // Временная заглушка
 
-
-        return 0;
+        return MemoryUtils.getECSEntityCount();
     }
 
     /**
@@ -266,14 +265,11 @@ public class PerformanceMonitor implements Disposable {
      * @return среднее время кадра
      */
     public float getAverageFrameTime() {
-
-        float sum = 0;
-        for (float frameTime : frameTimes) {
-            sum += frameTime;
+        int count = frameArrayFullFlag ? frameTimes.length : frameArrayIndex;
+        if (count == 0) {
+            return 0;
         }
-        float average = sum / frameTimes.length;
-
-        return average * 1000; // Convert to milliseconds
+        return frameTimeValue / count;
     }
 
     /**

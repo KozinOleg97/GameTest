@@ -12,12 +12,6 @@ import javax.inject.Singleton;
 @Module
 public class InputModule {
 
-//    @Provides
-//    @Singleton
-//    InputService provideInputService() {
-//        return new InputService();
-//    }
-
     @Provides
     @Singleton
     WorldMapInputProcessor provideWorldMapInputProcessor(InputService inputService,

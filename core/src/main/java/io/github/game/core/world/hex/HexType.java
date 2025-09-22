@@ -1,8 +1,11 @@
 package io.github.game.core.world.hex;
 
+import lombok.Getter;
+
 /**
  * Перечисление возможных типов местности для гекса.
  */
+@Getter
 public enum HexType {
     PLAINS("Равнины"),
     FOREST("Лес"),
@@ -18,7 +21,4 @@ public enum HexType {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
 }

@@ -54,8 +54,6 @@ public class GameScreen implements Screen {
         // Установка обработчика ввода
         Gdx.input.setInputProcessor(inputManager.getInputMultiplexer());
 
-        // Инициализация гексов (создание ECS-сущностей)
-        worldEntityService.initializeHexEntities();
 
         // Создание игрока и NPC через отдельный сервис
         characterEntityService.createPlayer(100, 100);

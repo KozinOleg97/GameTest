@@ -64,7 +64,7 @@ public class HexMapRenderer {
     private boolean needsRebuild = true;
 
     // Массивы для быстрого доступа
-    private float[] vertices = new float[8 * 2];
+    private final float[] vertices = new float[8 * 2];
 
 
     @Inject
@@ -125,17 +125,17 @@ public class HexMapRenderer {
 
                 filledHexCount++;
                 var hex = hexMap.getHex(q, r);
-                shapeRenderer.setColor(hexColorsMap.getOrDefault(hex.getType(), defaultColor));
+                shapeRenderer.setColor(hexColorsMap.get(hex.getType()));
 
-                // Отрисовываем гекс четырьмя треугольниками
-                shapeRenderer.triangle(vertices[0], vertices[1], vertices[2], vertices[3],
-                                       vertices[4], vertices[5]);
-                shapeRenderer.triangle(vertices[0], vertices[1], vertices[4], vertices[5],
-                                       vertices[8], vertices[9]);
+                // Отрисовываем гекс двумя треугольниками и квадратом
+                shapeRenderer.rect(vertices[10], vertices[11], vertices[2] - vertices[10],
+                                   vertices[9] - vertices[11]);
+
+                shapeRenderer.triangle(vertices[2], vertices[3], vertices[10], vertices[11],
+                                       vertices[0], vertices[1]);
+
                 shapeRenderer.triangle(vertices[4], vertices[5], vertices[6], vertices[7],
                                        vertices[8], vertices[9]);
-                shapeRenderer.triangle(vertices[8], vertices[9], vertices[10], vertices[11],
-                                       vertices[0], vertices[1]);
 
             }
             y += Y_PITCH;
