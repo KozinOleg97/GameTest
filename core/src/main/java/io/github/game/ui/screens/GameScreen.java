@@ -8,6 +8,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.game.ecs.EntityFactory;
+import io.github.game.ecs.PooledEngineCnt;
 import io.github.game.input.InputManager;
 import io.github.game.input.InputMode;
 import io.github.game.monitoring.PerformanceLogger;
@@ -20,7 +21,7 @@ import javax.inject.Inject;
 
 public class GameScreen implements Screen {
 
-    private final PooledEngine engine;
+    private final PooledEngineCnt engine;
     private final EntityFactory entityFactory;
     private final WorldEntityService worldEntityService;
     private final HexMapRenderer hexMapRenderer;
@@ -31,7 +32,7 @@ public class GameScreen implements Screen {
     private final PerformanceMonitor performanceMonitor;
 
     @Inject
-    public GameScreen(PooledEngine engine,
+    public GameScreen(PooledEngineCnt engine,
                       EntityFactory entityFactory,
                       WorldEntityService worldEntityService,
                       HexMapRenderer hexMapRenderer,

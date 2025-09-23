@@ -1,10 +1,12 @@
 package io.github.game.monitoring;
 
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.game.ecs.PooledEngineCnt;
 import io.github.game.settings.GraphicsSettings;
 import io.github.game.utils.MemoryUtils;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class PerformanceMonitor implements Disposable {
 
 
     private final BitmapFont font;
+    private final PooledEngineCnt engine;
 
     private final float[] frameTimes;
     private final int frameArraySize;
@@ -49,11 +52,13 @@ public class PerformanceMonitor implements Disposable {
     public PerformanceMonitor(GraphicsSettings graphicsSettings,
                               @Named("uiSpriteBatch") SpriteBatch uiSpriteBatch,
                               @Named("uiViewport") Viewport uiViewport,
-                              BitmapFont font) {
+                              BitmapFont font,
+                              PooledEngineCnt engine) {
         this.graphicsSettings = graphicsSettings;
         this.uiSpriteBatch = uiSpriteBatch;
         this.uiViewport = uiViewport;
         this.font = font;
+        this.engine = engine;
 
         this.frameTimeValue = 0;
         this.frameArrayIndex = 0;
@@ -256,7 +261,7 @@ public class PerformanceMonitor implements Disposable {
         // TODO: Реализовать получение количества сущностей из ECS движка
         // Временная заглушка
 
-        return MemoryUtils.getECSEntityCount();
+        return engine.getEntityCount();
     }
 
     /**

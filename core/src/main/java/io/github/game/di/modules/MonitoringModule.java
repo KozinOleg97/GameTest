@@ -1,10 +1,12 @@
 package io.github.game.di.modules;
 
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Module;
 import dagger.Provides;
+import io.github.game.ecs.PooledEngineCnt;
 import io.github.game.monitoring.PerformanceMonitor;
 import io.github.game.settings.GraphicsSettings;
 import javax.inject.Named;
@@ -18,7 +20,9 @@ public class MonitoringModule {
     PerformanceMonitor providePerformanceMonitor(GraphicsSettings graphicsSettings,
                                                  @Named("uiSpriteBatch") SpriteBatch uiSpriteBatch,
                                                  @Named("uiViewport") Viewport uiViewport,
-                                                 BitmapFont font) {
-        return new PerformanceMonitor(graphicsSettings, uiSpriteBatch, uiViewport, font);
+                                                 BitmapFont font,
+                                                 PooledEngineCnt engine) {
+        return new PerformanceMonitor(graphicsSettings, uiSpriteBatch, uiViewport, font,
+                                      engine);
     }
 }

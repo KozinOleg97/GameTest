@@ -17,11 +17,11 @@ import javax.inject.Singleton;
 @Singleton
 public class EntityFactory {
 
-    private final PooledEngine engine;
+    private final PooledEngineCnt engine;
     private final ResourceManager resourceManager;
 
     @Inject
-    public EntityFactory(PooledEngine engine, ResourceManager resourceManager) {
+    public EntityFactory(PooledEngineCnt engine, ResourceManager resourceManager) {
         this.engine = engine;
         this.resourceManager = resourceManager;
     }

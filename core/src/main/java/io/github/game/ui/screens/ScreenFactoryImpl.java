@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.game.ecs.EntityFactory;
+import io.github.game.ecs.PooledEngineCnt;
 import io.github.game.input.InputManager;
 import io.github.game.monitoring.PerformanceMonitor;
 import io.github.game.renderer.HexMapRenderer;
@@ -29,7 +30,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final ScreenSwitcher screenSwitcher;
     private final WorldEntityService worldEntityService;
     private final EntityFactory entityFactory;
-    private final PooledEngine engine;
+    private final PooledEngineCnt engine;
     private final HexMapRenderer hexMapRenderer;
     private final InputManager inputManager;
     private final Viewport viewport;
@@ -44,7 +45,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              ScreenSwitcher screenSwitcher,
                              WorldEntityService worldEntityService,
                              EntityFactory entityFactory,
-                             PooledEngine engine,
+                             PooledEngineCnt engine,
                              HexMapRenderer hexMapRenderer,
                              InputManager inputManager,
                              Viewport viewport,

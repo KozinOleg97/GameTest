@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import io.github.game.ecs.EntityFactory;
+import io.github.game.ecs.PooledEngineCnt;
 import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -14,7 +15,7 @@ import javax.inject.Singleton;
 @Singleton
 public class CharacterEntityService {
 
-    private final PooledEngine engine;
+    private final PooledEngineCnt engine;
     private final EntityFactory entityFactory;
     private boolean playerCreated = false;
 
@@ -25,7 +26,7 @@ public class CharacterEntityService {
      * @param entityFactory фабрика для создания сущностей
      */
     @Inject
-    public CharacterEntityService(PooledEngine engine, EntityFactory entityFactory) {
+    public CharacterEntityService(PooledEngineCnt engine, EntityFactory entityFactory) {
         this.engine = engine;
         this.entityFactory = entityFactory;
     }
@@ -40,7 +41,6 @@ public class CharacterEntityService {
         if (!playerCreated) {
             Entity player = entityFactory.createPlayer(x, y);
             engine.addEntity(player);
-            MemoryUtils.EntityAdded();
 
             playerCreated = true;
             Gdx.app.log("EntityManagement", "Player entity created at (" + x + ", " + y + ")");
@@ -58,7 +58,7 @@ public class CharacterEntityService {
     public void createNPC(int x, int y) {
         Entity npc = entityFactory.createNPC(x, y);
         engine.addEntity(npc);
-        MemoryUtils.EntityAdded();
+
         Gdx.app.log("EntityManagement", "NPC entity created at (" + x + ", " + y + ")");
     }
 
