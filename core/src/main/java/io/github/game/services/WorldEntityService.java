@@ -1,14 +1,8 @@
 package io.github.game.services;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Gdx;
 import io.github.game.core.world.HexMap;
-import io.github.game.core.world.hex.Hex;
 import io.github.game.ecs.EntityFactory;
-import io.github.game.ecs.PooledEngineCnt;
-import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
@@ -19,7 +13,7 @@ import lombok.Getter;
 @Singleton
 public class WorldEntityService {
 
-    private final PooledEngineCnt engine;
+    private final PooledEngine engine;
     private final HexMap hexMap;
     private final EntityFactory entityFactory;
     private final HexMapService hexMapService;
@@ -32,7 +26,7 @@ public class WorldEntityService {
     private boolean hexEntitiesCreated = false;
 
     @Inject
-    public WorldEntityService(PooledEngineCnt engine, HexMap hexMap, EntityFactory entityFactory,
+    public WorldEntityService(PooledEngine engine, HexMap hexMap, EntityFactory entityFactory,
                               HexMapService hexMapService) {
         this.engine = engine;
         this.hexMap = hexMap;

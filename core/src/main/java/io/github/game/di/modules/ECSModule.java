@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.ecs.EntityFactory;
-import io.github.game.ecs.PooledEngineCnt;
 import io.github.game.ecs.systems.CameraControlSystem;
 import io.github.game.ecs.systems.MovementSystem;
 import io.github.game.ecs.systems.NPCLogicSystem;
@@ -24,7 +23,7 @@ public class ECSModule {
 
     @Provides
     @Singleton
-    EntityFactory provideEntityFactory(PooledEngineCnt engine, ResourceManager resourceManager) {
+    EntityFactory provideEntityFactory(PooledEngine engine, ResourceManager resourceManager) {
         return new EntityFactory(engine, resourceManager);
     }
 
@@ -57,14 +56,14 @@ public class ECSModule {
 
     @Provides
     @Singleton
-    PooledEngineCnt providePooledEngine(PlayerInputSystem playerInputSystem,
-                                        MovementSystem movementSystem,
-                                        NPCLogicSystem npcLogicSystem,
-                                        CameraControlSystem cameraControlSystem,
+    PooledEngine providePooledEngine(PlayerInputSystem playerInputSystem,
+                                     MovementSystem movementSystem,
+                                     NPCLogicSystem npcLogicSystem,
+                                     CameraControlSystem cameraControlSystem,
 
-                                        RenderingSystem renderingSystem
+                                     RenderingSystem renderingSystem
     ) {
-        PooledEngineCnt engine = new PooledEngineCnt();
+        PooledEngine engine = new PooledEngine();
 
         // Важно: системы обновления должны быть до системы рендеринга
 

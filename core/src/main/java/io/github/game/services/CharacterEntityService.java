@@ -4,8 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import io.github.game.ecs.EntityFactory;
-import io.github.game.ecs.PooledEngineCnt;
-import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -15,7 +13,7 @@ import javax.inject.Singleton;
 @Singleton
 public class CharacterEntityService {
 
-    private final PooledEngineCnt engine;
+    private final PooledEngine engine;
     private final EntityFactory entityFactory;
     private boolean playerCreated = false;
 
@@ -26,7 +24,7 @@ public class CharacterEntityService {
      * @param entityFactory фабрика для создания сущностей
      */
     @Inject
-    public CharacterEntityService(PooledEngineCnt engine, EntityFactory entityFactory) {
+    public CharacterEntityService(PooledEngine engine, EntityFactory entityFactory) {
         this.engine = engine;
         this.entityFactory = entityFactory;
     }
