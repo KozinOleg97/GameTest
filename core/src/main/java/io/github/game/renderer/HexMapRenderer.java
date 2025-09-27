@@ -9,12 +9,16 @@ import static io.github.game.core.world.hex.HexType.PLAINS;
 import static io.github.game.core.world.hex.HexType.SWAMP;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import io.github.game.core.world.HexMap;
+import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexType;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -34,14 +38,12 @@ public class HexMapRenderer {
 
     static {
         // Вычисляем вершины единичного гекса один раз при загрузке класса
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
             // начинаем с нижнего элемента
             double angle = 2 * Math.PI / 6 * (i + 4.5);
             UNIT_HEX_VERTICES[i * 2] = HEX_SIZE * (float) Math.cos(angle);
             UNIT_HEX_VERTICES[i * 2 + 1] = HEX_SIZE * (float) Math.sin(angle);
         }
-        UNIT_HEX_VERTICES[12] = UNIT_HEX_VERTICES[0];
-        UNIT_HEX_VERTICES[13] = UNIT_HEX_VERTICES[1];
         UNIT_HEX_VERTICES[14] = UNIT_HEX_VERTICES[0];
         UNIT_HEX_VERTICES[15] = UNIT_HEX_VERTICES[1] - HEX_SIZE;
     }
@@ -50,6 +52,7 @@ public class HexMapRenderer {
     private final ShapeRenderer shapeRenderer;
     private final OrthographicCamera camera;
 
+    // цвета гексов
     private final Map<HexType, Color> hexColorsMap = new EnumMap<>(
         Map.of(PLAINS, new Color(0.4f, 0.8f, 0.2f, 1),    // Зеленый для равнин
                FOREST, new Color(0.2f, 0.6f, 0.1f, 1),     // Темно-зеленый для леса
@@ -61,10 +64,20 @@ public class HexMapRenderer {
         ));
 
     private final Color defaultColor = new Color(0.9f, 0.1f, 0.9f, 1);
-    private boolean needsRebuild = true;
+    static private final Color contourColor = new Color(0, 0, 0, 1);
 
-    // Массивы для быстрого доступа
-    private final float[] vertices = new float[8 * 2];
+    // кешированные floatBits для цветов
+    private final Map<HexType, Float> hexFloatBits = hexColorsMap
+        .entrySet().stream()
+        .collect(Collectors.toMap(
+            e -> e.getKey(),
+            e -> e.getValue().toFloatBits()
+        ));
+
+    private final float defaultFloatBits = defaultColor.toFloatBits();
+
+    private final Matrix4 combinedMatrix = new Matrix4();
+    private final LineRenderer lineRenderer;
 
 
     @Inject
@@ -72,14 +85,13 @@ public class HexMapRenderer {
         this.hexMap = hexMap;
         this.shapeRenderer = shapeRenderer;
         this.camera = camera;
+        this.lineRenderer = new LineRenderer(10000, contourColor);
     }
 
     /**
      * Основной метод рендеринга гексовой карты
      */
     public void render() {
-
-        shapeRenderer.setProjectionMatrix(camera.combined);
 
         // Получаем видимую область камеры
         float camX = camera.position.x;
@@ -107,64 +119,114 @@ public class HexMapRenderer {
         int filledHexCount = 0;
         int lineHexCount = 0;
 
-        float initialX = HEX_WIDTH * minQ;
-        float x;
-        float y = Y_PITCH * minR;
+        combinedMatrix.set(camera.combined);
+
+        var renderer = shapeRenderer.getRenderer();
+
+        float x, y;
         float oddOffset = HALF_WIDTH * (minR & 1);
+        renderer.begin(combinedMatrix, GL20.GL_TRIANGLES);
+
+        Hex hex = hexMap.getHex(minQ, minR);
+        HexType prevType = hex.getType();
+        float colorBits = hexFloatBits.get(prevType);
+
         // Отрисовка заполненных гексов
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (int r = minR; r <= maxR; r++) {
-            x = initialX + oddOffset;
-            oddOffset = HALF_WIDTH - oddOffset;
+            if (renderer.getMaxVertices() - renderer.getNumVertices() < 12 * (maxQ - minQ + 1)) {
+                renderer.end();
+                renderer.begin(combinedMatrix, GL20.GL_TRIANGLES);
+            }
+            y = Y_PITCH * r;
+
             for (int q = minQ; q <= maxQ; q++) {
-                for (int i = 0; i < 6; i++) {
-                    vertices[i * 2] = x + UNIT_HEX_VERTICES[i * 2];
-                    vertices[i * 2 + 1] = y + UNIT_HEX_VERTICES[i * 2 + 1];
+                x = HEX_WIDTH * q + oddOffset;
+
+                hex = hexMap.getHex(q, r);
+                if (prevType != hex.getType()) {
+                    prevType = hex.getType();
+                    colorBits = hexFloatBits.get(prevType);
                 }
-                x += HEX_WIDTH;
+
+                for (int i = 0; i < 12; i += 4) {
+                    for (int j = 0; j < 6; j += 2) {
+                        renderer.color(colorBits);
+                        renderer.vertex(x + UNIT_HEX_VERTICES[i + j], y + UNIT_HEX_VERTICES[i + j + 1], 0);
+                    }
+                }
+
+                for (int j = 0; j < 12; j += 4) {
+                    renderer.color(colorBits);
+                    renderer.vertex(x + UNIT_HEX_VERTICES[j], y + UNIT_HEX_VERTICES[j + 1], 0);
+                }
 
                 filledHexCount++;
-                var hex = hexMap.getHex(q, r);
-                shapeRenderer.setColor(hexColorsMap.get(hex.getType()));
-
-                // Отрисовываем гекс двумя треугольниками и квадратом
-                shapeRenderer.rect(vertices[10], vertices[11], vertices[2] - vertices[10],
-                                   vertices[9] - vertices[11]);
-
-                shapeRenderer.triangle(vertices[2], vertices[3], vertices[10], vertices[11],
-                                       vertices[0], vertices[1]);
-
-                shapeRenderer.triangle(vertices[4], vertices[5], vertices[6], vertices[7],
-                                       vertices[8], vertices[9]);
-
             }
-            y += Y_PITCH;
+
+            oddOffset = HALF_WIDTH - oddOffset;
         }
-        shapeRenderer.end();
 
+        renderer.end();
+
+        var lineRenderer = this.lineRenderer;
         // Отрисовка контуров гексов
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(0, 0, 0, 1);
+        float[] buffer = lineRenderer.getVerticesBuffer();
+        int endIndex = 0;
+        lineRenderer.begin(combinedMatrix, GL20.GL_LINE_STRIP);
+        int vertSize = lineRenderer.getVertexSize();
 
-        maxR++;
-        minR &= ~1;
-        y = Y_PITCH * minR;
-        for (int r = minR; r <= maxR; r += 2) {
-            x = initialX;
-            for (int q = minQ; q <= maxQ; q++) {
-                for (int i = 0; i < 8; i++) {
-                    vertices[i * 2] = x + UNIT_HEX_VERTICES[i * 2];
-                    vertices[i * 2 + 1] = y + UNIT_HEX_VERTICES[i * 2 + 1];
+        for (int q = minQ; q <= maxQ; q++) {
+            if (lineRenderer.getMaxVertices() - endIndex < 8 * (maxR - (minR & ~1) + 1)) {
+                lineRenderer.end(endIndex);
+                endIndex = 0;
+                lineRenderer.begin(combinedMatrix, GL20.GL_LINE_STRIP);
+            }
+            x = HEX_WIDTH * q;
+            y = Y_PITCH * minR;
+
+            for (int r = minR & ~1; r <= maxR; r += 2) {
+                y = Y_PITCH * r;
+
+                for (int i = 12; i >= 6; i -= 2) {
+                    buffer[endIndex] = x + UNIT_HEX_VERTICES[i];
+                    buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[i + 1];
+                    endIndex += vertSize;
                 }
-                x += HEX_WIDTH;
+            }
+
+            if ((maxR & 1) == 1)
+            {
+                buffer[endIndex] = x + UNIT_HEX_VERTICES[0];
+                buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[1] + 2 * Y_PITCH;
+                buffer[endIndex + 2] = x + UNIT_HEX_VERTICES[6];
+                buffer[endIndex + 3] = y + UNIT_HEX_VERTICES[7];
+                endIndex += vertSize * 2;
+            }
+
+            for (int i = 4; i >= 0; i -= 2) {
+                buffer[endIndex] = x + UNIT_HEX_VERTICES[i];
+                buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[i + 1];
+                endIndex += vertSize;
+            }
+
+            for (int r = (maxR & ~1) - 2; r >= minR - 1; r -= 2) {
+                y = Y_PITCH * r;
+
+                for (int i = 6; i >= 0; i -= 2) {
+                    buffer[endIndex] = x + UNIT_HEX_VERTICES[i];
+                    buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[i + 1];
+                    endIndex += vertSize;
+                }
 
                 lineHexCount++;
-                shapeRenderer.polyline(vertices, 0, 16);
-
             }
-            y += Y_PITCH * 2;
+
+            buffer[endIndex] = x + UNIT_HEX_VERTICES[2];
+            buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[3];
+            endIndex += vertSize;
         }
-        shapeRenderer.end();
+
+        lineRenderer.end(endIndex);
 
 //        // Логируем количество отрисованных гексов
 //        Gdx.app.log("Rendered",
@@ -174,14 +236,6 @@ public class HexMapRenderer {
 //        shapeRenderer.setColor(Color.RED);
 //        shapeRenderer.rect(left + 1, bottom + 1, right - left - 1, top - bottom - 1);
 //        shapeRenderer.end();
-    }
-
-
-    /**
-     * Помечает, что геометрию нужно перестроить
-     */
-    public void markDirty() {
-        needsRebuild = true;
     }
 
     /**

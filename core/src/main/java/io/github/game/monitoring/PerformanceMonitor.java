@@ -139,6 +139,9 @@ public class PerformanceMonitor implements Disposable {
             font.draw(uiSpriteBatch, "Entities: " + getEntityCount(), 20, yPosition);
             yPosition -= lineHeight;
 
+            font.draw(uiSpriteBatch, "Systems: " + getSystemsCount(), 20, yPosition);
+            yPosition -= lineHeight;
+
             // Кастомные метрики
             for (Map.Entry<String, String> entry : customMetrics.entrySet()) {
                 font.draw(uiSpriteBatch, entry.getKey() + ": " + entry.getValue(), 20, yPosition);
@@ -252,7 +255,7 @@ public class PerformanceMonitor implements Disposable {
 
 
     /**
-     * Возвращает количество активных сущностей (заглушка для будущей реализации).
+     * Возвращает количество активных сущностей
      *
      * @return количество сущностей
      */
@@ -261,6 +264,15 @@ public class PerformanceMonitor implements Disposable {
         // Временная заглушка
 
         return engine.getEntities().size();
+    }
+
+    /**
+     * Возвращает количество активных систем
+     *
+     * @return количество сущностей
+     */
+    public int getSystemsCount(){
+        return engine.getSystems().size();
     }
 
     /**

@@ -89,8 +89,10 @@ public class GameScreen implements Screen {
 
         //----------------------------------------------------------
 
+        performanceMonitor.startEvent("monitoring_render");
         // Рендерим статистику производительности поверх всего
         performanceMonitor.render();
+        performanceMonitor.endEvent("monitoring_render");
 
         if (Gdx.graphics.getFrameId() % 60 == 0) {
             PerformanceLogger.logMemoryUsage("During rendering");
