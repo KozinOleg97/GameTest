@@ -4,6 +4,7 @@ import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexCoordinates;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -153,6 +154,63 @@ public class HexMap {
      */
     public int getHeight() {
         return height;
+    }
+
+    public Iterator<Hex> getRowIterator(int r, int initialQ) {
+        if (r < 0 || r >= height) {
+            return Collections.emptyIterator();
+        }
+
+        int startQ = Math.max(initialQ, 0);
+        if (startQ >= width) {
+            return Collections.emptyIterator();
+        }
+
+        return new Iterator<>() {
+            private int currentQ = startQ;
+
+            @Override
+            public boolean hasNext() {
+                return currentQ < width;
+            }
+
+            @Override
+            public Hex next() {
+                return hexGrid[r][currentQ++];
+            }
+        };
+    }
+
+    public Iterator<Hex> getRowIteratorUnsafe(int r, int initialQ) {
+        int startQ = Math.max(initialQ, 0);
+        if (startQ >= width) {
+            return Collections.emptyIterator();
+        }
+
+        return new Iterator<>() {
+            private int currentQ = startQ;
+
+            @Override
+            public boolean hasNext() {
+                return currentQ < width;
+            }
+
+            @Override
+            public Hex next() {
+                return hexGrid[r][currentQ++];
+            }
+        };
+    }
+
+    public Hex[] getRowDirectAccess(int r) {
+//        if (r < 0 || r >= height) {
+//            return new Hex[0];
+//        }
+        return hexGrid[r];
+    }
+
+    public Hex[][] getHexGrid() {
+        return hexGrid;
     }
 
     /**

@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-public class LineRenderer {
+public class HexRenderer {
     private int primitiveType;
     private final int maxVertices;
 
@@ -21,11 +21,13 @@ public class LineRenderer {
     private final float[] vertices;
     private final Matrix4 projModelView = new Matrix4();
 
-    public LineRenderer (int maxVertices, Color contourColor) {
+    public HexRenderer (int maxVertices) {
         this.maxVertices = maxVertices;
-        this.shader = createLineShader(contourColor);
+        this.shader = createHexShader();
 
-        mesh = new Mesh(false, maxVertices, 0, new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE));
+        mesh = new Mesh(false, maxVertices, 0,
+                        new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE),
+                        new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
 
         vertexSize = mesh.getVertexAttributes().vertexSize / 4;
         vertices = new float[maxVertices * vertexSize];
@@ -62,28 +64,34 @@ public class LineRenderer {
     }
 
     /** Returns a new instance of the default shader used by SpriteBatch for GL2 when no shader is specified. */
-    static public ShaderProgram createLineShader (Color contourColor) {
-        String vertexShader = createLineVertexShader();
-        String fragmentShader = createLineFragmentShader(contourColor);
+    static public ShaderProgram createHexShader () {
+        String vertexShader = createHexVertexShader();
+        String fragmentShader = createHexFragmentShader();
         ShaderProgram program = new ShaderProgram(vertexShader, fragmentShader);
         if (!program.isCompiled()) throw new GdxRuntimeException("Error compiling shader: " + program.getLog());
         return program;
     }
 
-    static private String createLineVertexShader () {
-        String shader = "in vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n"
+    static private String createHexVertexShader () {
+        String shader = "#version 150\n"
+                        + "in vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n"
+                        + "in vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n"
                         + "uniform mat4 u_projModelView;\n"
+                        + "flat out vec4 v_col;\n"
                         + "void main() {\n"
                         + "   gl_Position = u_projModelView * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n"
+                        + "   v_col = " + ShaderProgram.COLOR_ATTRIBUTE + ";\n"
                         + "   gl_PointSize = 1.0;\n"
                         + "}";
         return shader;
     }
 
-    static private String createLineFragmentShader (Color contourColor) {
-        String shader = "#ifdef GL_ES\nprecision mediump float;\n#endif\n"
+    static private String createHexFragmentShader () {
+        String shader = "#version 150\n"
+                        + "#ifdef GL_ES\nprecision mediump float;\n#endif\n"
+                        + "flat in vec4 v_col;\n"
                         + "void main() {\n"
-                        + "   gl_FragColor =  + vec4(" + contourColor.a + "," + contourColor.b + "," + contourColor.g + "," + contourColor.r + ");\n"
+                        + "   gl_FragColor = v_col;\n"
                         + "}";
         return shader;
     }
