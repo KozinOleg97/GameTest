@@ -12,7 +12,7 @@ import io.github.game.settings.GameplaySettings;
 import javax.inject.Singleton;
 
 /**
- * Dagger модуль для предоставления зависимостей, связанных с игровым миром.
+ * Dagger модуль для предоставления зависимостей, связанных с игровым миром и генерацией.
  */
 @Module
 public class WorldModule {

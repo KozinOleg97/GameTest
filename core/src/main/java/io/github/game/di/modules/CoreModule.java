@@ -11,6 +11,9 @@ import io.github.game.ui.screens.ScreenSwitcher;
 import io.github.game.utils.ResourceManager;
 import javax.inject.Singleton;
 
+/**
+ * Основные компоненты приложения
+ */
 @Module
 public class CoreModule {
 
@@ -50,12 +53,7 @@ public class CoreModule {
         return Gdx.input;
     }
 
-    //TODO Уточнить, к какому модулю лучше отнести
-    @Provides
-    @Singleton
-    SpriteBatch provideSpriteBatch() {
-        return new SpriteBatch();
-    }
+
 
     @Provides
     @Singleton

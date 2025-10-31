@@ -6,6 +6,9 @@ import io.github.game.ui.screens.ScreenFactory;
 import io.github.game.ui.screens.ScreenFactoryImpl;
 import javax.inject.Singleton;
 
+/**
+ * UI screens
+ */
 @Module
 public class ScreenModule {
 
