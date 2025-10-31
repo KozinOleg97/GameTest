@@ -4,17 +4,17 @@ import com.badlogic.ashley.core.Entity;
 import io.github.game.core.world.HexMap;
 import java.util.List;
 
-public class RandomLocationGenerator implements LocationGenerator{
+public class RandomLocationGenerator implements LocationGenerator {
 
     HexMap hexMap;
 
-    public RandomLocationGenerator(HexMap hexMap, int count) {
+    public RandomLocationGenerator(HexMap hexMap, int count, long seed) {
         this.hexMap = hexMap;
     }
 
     @Override
     public List<Entity> generateLocations() {
-
+    // TODO реализовать
 
         return null;
     }

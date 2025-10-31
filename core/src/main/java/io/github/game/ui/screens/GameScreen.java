@@ -6,8 +6,10 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import io.github.game.core.world.hex.HexCoordinates;
+import io.github.game.core.world.generator.GenerationContext;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.input.InputManager;
 import io.github.game.input.InputMode;
@@ -25,34 +27,39 @@ public class GameScreen implements Screen {
     private final PooledEngine engine;
     private final EntityFactory entityFactory;
     private final WorldEntityService worldEntityService;
-    private final HexMapRenderer hexMapRenderer;
-
-
     private final InputManager inputManager;
     private final Viewport viewport;
     private final CharacterEntityService characterEntityService;
     private final PerformanceMonitor performanceMonitor;
-
     private final GameplaySettings gameplaySettings;
+    private final ShapeRenderer shapeRenderer;
+    private final OrthographicCamera camera;
+    private final GenerationContext generationContext;
+    private HexMapRenderer hexMapRenderer;
 
     @Inject
     public GameScreen(PooledEngine engine,
                       EntityFactory entityFactory,
                       WorldEntityService worldEntityService,
-                      HexMapRenderer hexMapRenderer,
                       InputManager inputManager,
                       Viewport viewport,
                       CharacterEntityService characterEntityService,
-                      PerformanceMonitor performanceMonitor, GameplaySettings gameplaySettings) {
+                      PerformanceMonitor performanceMonitor,
+                      GameplaySettings gameplaySettings,
+                      ShapeRenderer shapeRenderer,
+                      OrthographicCamera camera,
+                      GenerationContext generationContext) {
         this.engine = engine;
         this.entityFactory = entityFactory;
         this.worldEntityService = worldEntityService;
-        this.hexMapRenderer = hexMapRenderer;
         this.inputManager = inputManager;
         this.viewport = viewport;
         this.characterEntityService = characterEntityService;
         this.performanceMonitor = performanceMonitor;
         this.gameplaySettings = gameplaySettings;
+        this.shapeRenderer = shapeRenderer;
+        this.camera = camera;
+        this.generationContext = generationContext;
     }
 
     @Override
@@ -60,16 +67,16 @@ public class GameScreen implements Screen {
         // Установка обработчика ввода
         Gdx.input.setInputProcessor(inputManager.getInputMultiplexer());
 
+
+
+        this.hexMapRenderer = new HexMapRenderer(generationContext, shapeRenderer, camera);
+
         // Создание игрока и NPC через отдельный сервис
         characterEntityService.createPlayer(100, 100);
 
         for (int i = 0; i < 10; i++) {
             characterEntityService.createNPC(random.nextInt(1000), random.nextInt(1000));
         }
-
-//        for (int i = 0; i < 100; i++) {
-//            worldEntityService.createRandomLocation();
-//        }
 
         MemoryUtils.logMemoryUsage("GameScreen shown");
     }

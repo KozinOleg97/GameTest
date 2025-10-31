@@ -80,18 +80,6 @@ public class MainGame extends Game implements ScreenSwitcher {
         // Явное завершение процесса
         Gdx.app.log("App", "Application is shutting down...");
         Gdx.app.exit();
-
-//        // Для гарантированного завершения процесса
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(1000); // Даем время для корректного завершения
-//                System.exit(0);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//                System.exit(0);
-//            }
-//        }).start();
-
     }
 
     @Override

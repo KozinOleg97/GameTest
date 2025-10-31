@@ -11,7 +11,8 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Module;
 import dagger.Provides;
-import io.github.game.core.world.HexMap;
+import io.github.game.core.world.generator.GenerationContext;
+import io.github.game.core.world.generator.GenerationManager;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.ecs.systems.CameraControlSystem;
 import io.github.game.ecs.systems.MovementSystem;
@@ -92,13 +93,13 @@ public class GameModule {
         return shapeRenderer;
     }
 
-    @Provides
-    @Singleton
-    HexMapRenderer provideHexMapRenderer(HexMap hexMap,
-                                         ShapeRenderer shapeRenderer,
-                                         OrthographicCamera camera) {
-        return new HexMapRenderer(hexMap, shapeRenderer, camera);
-    }
+//    @Provides
+//    @Singleton
+//    HexMapRenderer provideHexMapRenderer(GenerationContext context,
+//                                         ShapeRenderer shapeRenderer,
+//                                         OrthographicCamera camera) {
+//        return new HexMapRenderer(context, shapeRenderer, camera);
+//    }
 
     @Provides
     @Singleton
@@ -163,10 +164,12 @@ public class GameModule {
 
     @Provides
     @Singleton
-    WorldEntityService provideWorldEntityService(PooledEngine engine, HexMap hexMap,
-                                                 EntityFactory entityFactory
+    WorldEntityService provideWorldEntityService(PooledEngine engine,
+                                                 EntityFactory entityFactory,
+                                                 GenerationManager generationManager,
+                                                 GenerationContext generationContext
     ) {
-        return new WorldEntityService(engine, hexMap, entityFactory);
+        return new WorldEntityService(engine, entityFactory, generationManager, generationContext);
     }
 
     // From ECSModule

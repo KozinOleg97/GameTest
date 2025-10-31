@@ -4,9 +4,12 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.game.core.world.generator.GenerationContext;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.input.InputManager;
 import io.github.game.monitoring.PerformanceMonitor;
@@ -16,7 +19,6 @@ import io.github.game.services.CharacterEntityService;
 import io.github.game.services.WorldEntityService;
 import io.github.game.settings.GameplaySettings;
 import io.github.game.utils.ResourceManager;
-import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -37,6 +39,9 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final CharacterEntityService characterEntityService;
     private final PerformanceMonitor performanceMonitor;
     private final GameplaySettings gameplaySettings;
+    private final ShapeRenderer shapeRenderer;
+    private final OrthographicCamera camera;
+    private final GenerationContext generationContext;
 
     @Inject
     public ScreenFactoryImpl(ResourceManager resourceManager,
@@ -52,7 +57,10 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              Viewport viewport,
                              CharacterEntityService characterEntityService,
                              PerformanceMonitor performanceMonitor,
-                             GameplaySettings gameplaySettings
+                             GameplaySettings gameplaySettings,
+                             ShapeRenderer shapeRenderer,
+                             OrthographicCamera camera,
+                             GenerationContext generationContext
     ) {
         this.resourceManager = resourceManager;
         this.spriteBatch = spriteBatch;
@@ -68,35 +76,40 @@ public class ScreenFactoryImpl implements ScreenFactory {
         this.characterEntityService = characterEntityService;
         this.performanceMonitor = performanceMonitor;
         this.gameplaySettings = gameplaySettings;
+        this.shapeRenderer = shapeRenderer;
+        this.camera = camera;
+        this.generationContext = generationContext;
     }
 
 
     @Override
     public LoadingScreen createLoadingScreen() {
         return new LoadingScreen(
-            Objects.requireNonNull(assetService, "AssetService must not be null"),
-            Objects.requireNonNull(spriteBatch, "SpriteBatch must not be null"),
-            Objects.requireNonNull(font, "Font must not be null"),
-            Objects.requireNonNull(screenSwitcher, "ScreenSwitcher must not be null")
+            assetService,
+            spriteBatch,
+            font,
+            screenSwitcher,
+            worldEntityService,
+            viewport
         );
     }
 
     @Override
     public GameScreen createGameScreen() {
         return new GameScreen(
-            Objects.requireNonNull(engine, "Engine must not be null"),
-            Objects.requireNonNull(entityFactory, "EntityFactory must not be null"),
-            Objects.requireNonNull(worldEntityService, "WorldEntityService must not be null"),
-            Objects.requireNonNull(hexMapRenderer, "HexMapRenderer must not be null"),
-            Objects.requireNonNull(inputManager, "InputManager must not be null"),
-            Objects.requireNonNull(viewport, "Viewport must not be null"),
-            Objects.requireNonNull(characterEntityService,
-                                   "CharacterEntityService must not be null"),
-            Objects.requireNonNull(performanceMonitor, "PerformanceMonitor must not be null"),
-            Objects.requireNonNull(gameplaySettings, "GameplaySettings must not be null")
+            engine,
+            entityFactory,
+            worldEntityService,
+            inputManager,
+            viewport,
+            characterEntityService,
+            performanceMonitor,
+            gameplaySettings,
+            shapeRenderer,
+            camera,
+            generationContext
 
-
-        );
+            );
     }
 
     @Override

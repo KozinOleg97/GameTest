@@ -18,19 +18,16 @@ public class RectangularWorldGenerator implements WorldGenerator {
     /**
      * Создает генератор прямоугольной области
      *
-     * @param startQ   начальная координата Q (столбец)
-     * @param startR   начальная координата R (строка)
-     * @param width    ширина области в гексах
-     * @param height   высота области в гексах
-     * @param baseType базовый тип гексов для заполнения области
+     * @param width  ширина области в гексах
+     * @param height высота области в гексах
+     * @param seed
      */
-    public RectangularWorldGenerator(int startQ, int startR, int width,
-                                     int height, HexType baseType) {
-        this.startQ = startQ;
-        this.startR = startR;
+    public RectangularWorldGenerator(int width, int height, long seed) {
+        this.startQ = 0;
+        this.startR = 0;
         this.width = width;
         this.height = height;
-        this.baseType = baseType;
+        this.baseType = HexType.FOREST;
     }
 
     /**

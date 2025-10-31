@@ -15,11 +15,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import io.github.game.core.world.HexMap;
+import io.github.game.core.world.generator.GenerationContext;
 import io.github.game.core.world.hex.HexType;
 import java.util.EnumMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Setter;
 
 
 @Singleton
@@ -42,7 +44,6 @@ public class HexMapRenderer {
         }
     }
 
-    private final HexMap hexMap;
     private final ShapeRenderer shapeRenderer;
     private final OrthographicCamera camera;
     // цвета гексов
@@ -58,15 +59,20 @@ public class HexMapRenderer {
     private final HexGridOutlineRenderer lineRenderer;
     private final HexGridTextureRenderer hexRenderer;
 
+    @Setter
+    private HexMap hexMap;
+
 
     @Inject
-    public HexMapRenderer(HexMap hexMap, ShapeRenderer shapeRenderer, OrthographicCamera camera) {
-        this.hexMap = hexMap;
+    public HexMapRenderer(GenerationContext context, ShapeRenderer shapeRenderer,
+                          OrthographicCamera camera) {
+        this.hexMap = context.getHexMap();
         this.shapeRenderer = shapeRenderer;
         this.camera = camera;
         this.lineRenderer = new HexGridOutlineRenderer(10000, contourColor, UNIT_HEX_VERTICES);
         this.hexRenderer = new HexGridTextureRenderer(10000, hexColorsMap, UNIT_HEX_VERTICES);
     }
+
 
     /**
      * Основной метод рендеринга гексовой карты
