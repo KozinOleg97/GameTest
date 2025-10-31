@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.core.world.HexMap;
-import io.github.game.core.world.generator.ProceduralWorldGenerator;
-import io.github.game.core.world.generator.WorldGenerator;
+import io.github.game.core.world.generator.location.LocationGenerator;
+import io.github.game.core.world.generator.location.RandomLocationGenerator;
+import io.github.game.core.world.generator.world.ProceduralWorldGenerator;
+import io.github.game.core.world.generator.world.WorldGenerator;
 import io.github.game.settings.GameplaySettings;
 import javax.inject.Singleton;
 
@@ -27,6 +29,12 @@ public class WorldModule {
 //        return new RectangularWorldGenerator(-5, -5, 100, 100, HexType.PLAINS);
 
         return new ProceduralWorldGenerator(settings.getHexSize(), settings.getHexSize(), 5050);
+    }
+
+    @Provides
+    @Singleton
+    public LocationGenerator provideLocationGenerator(HexMap hexMap) {
+        return new RandomLocationGenerator(hexMap, 20);
     }
 
     /**

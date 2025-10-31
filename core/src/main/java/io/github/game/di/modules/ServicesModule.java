@@ -6,7 +6,6 @@ import dagger.Provides;
 import io.github.game.core.world.HexMap;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.services.AssetService;
-import io.github.game.services.HexMapService;
 import io.github.game.services.InputService;
 import io.github.game.services.WorldEntityService;
 import io.github.game.utils.ResourceManager;
@@ -15,11 +14,6 @@ import javax.inject.Singleton;
 @Module
 public class ServicesModule {
 
-    @Provides
-    @Singleton
-    public HexMapService provideHexMapService(HexMap hexMap) {
-        return new HexMapService(hexMap);
-    }
 
     @Provides
     @Singleton
@@ -36,8 +30,8 @@ public class ServicesModule {
     @Provides
     @Singleton
     WorldEntityService provideWorldEntityService(PooledEngine engine, HexMap hexMap,
-                                                 EntityFactory entityFactory,
-                                                 HexMapService hexMapService) {
-        return new WorldEntityService(engine, hexMap, entityFactory, hexMapService);
+                                                 EntityFactory entityFactory
+    ) {
+        return new WorldEntityService(engine, hexMap, entityFactory);
     }
 }

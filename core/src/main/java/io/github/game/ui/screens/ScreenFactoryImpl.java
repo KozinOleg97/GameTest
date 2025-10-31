@@ -14,6 +14,7 @@ import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.AssetService;
 import io.github.game.services.CharacterEntityService;
 import io.github.game.services.WorldEntityService;
+import io.github.game.settings.GameplaySettings;
 import io.github.game.utils.ResourceManager;
 import java.util.Objects;
 import javax.inject.Inject;
@@ -35,6 +36,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
     private final Viewport viewport;
     private final CharacterEntityService characterEntityService;
     private final PerformanceMonitor performanceMonitor;
+    private final GameplaySettings gameplaySettings;
 
     @Inject
     public ScreenFactoryImpl(ResourceManager resourceManager,
@@ -49,7 +51,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
                              InputManager inputManager,
                              Viewport viewport,
                              CharacterEntityService characterEntityService,
-                             PerformanceMonitor performanceMonitor
+                             PerformanceMonitor performanceMonitor,
+                             GameplaySettings gameplaySettings
     ) {
         this.resourceManager = resourceManager;
         this.spriteBatch = spriteBatch;
@@ -64,6 +67,7 @@ public class ScreenFactoryImpl implements ScreenFactory {
         this.viewport = viewport;
         this.characterEntityService = characterEntityService;
         this.performanceMonitor = performanceMonitor;
+        this.gameplaySettings = gameplaySettings;
     }
 
 
@@ -88,7 +92,9 @@ public class ScreenFactoryImpl implements ScreenFactory {
             Objects.requireNonNull(viewport, "Viewport must not be null"),
             Objects.requireNonNull(characterEntityService,
                                    "CharacterEntityService must not be null"),
-            Objects.requireNonNull(performanceMonitor, "PerformanceMonitor must not be null")
+            Objects.requireNonNull(performanceMonitor, "PerformanceMonitor must not be null"),
+            Objects.requireNonNull(gameplaySettings, "GameplaySettings must not be null")
+
 
         );
     }

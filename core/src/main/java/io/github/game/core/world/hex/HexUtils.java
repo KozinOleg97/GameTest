@@ -1,13 +1,22 @@
 package io.github.game.core.world.hex;
 
+import com.badlogic.gdx.math.Vector2;
+import io.github.game.ecs.components.world.GlobalPositionComponent;
 import lombok.experimental.UtilityClass;
 
 /**
  * Утилитарный класс для математических операций с гексами. Поддерживает как работу напрямую с
- * объектами Hex, так и через HexMapService.
+ * объектами Hex.
  */
 @UtilityClass
 public final class HexUtils {
+
+    public static final float HEX_SIZE = 25f;
+    public static final float HEX_WIDTH = (float) (Math.sqrt(3) * HEX_SIZE);
+    public static final float HALF_WIDTH = HEX_WIDTH / 2;
+    public static final float HEX_HEIGHT = 2 * HEX_SIZE;
+    public static final float Y_PITCH = 1.5f * HEX_SIZE;
+
 
     /**
      * Направления для шести соседних гексов в осевых координатах (q, r)
@@ -100,4 +109,6 @@ public final class HexUtils {
             new HexCoordinates(q, r + 1)       // Юго-восток
         };
     }
+
+
 }

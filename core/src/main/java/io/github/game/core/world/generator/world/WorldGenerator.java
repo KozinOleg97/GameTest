@@ -1,4 +1,4 @@
-package io.github.game.core.world.generator;
+package io.github.game.core.world.generator.world;
 
 import io.github.game.core.world.HexMap;
 

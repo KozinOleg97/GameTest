@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.game.core.world.hex.HexCoordinates;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.input.InputManager;
 import io.github.game.input.InputMode;
@@ -15,6 +16,7 @@ import io.github.game.monitoring.PerformanceMonitor;
 import io.github.game.renderer.HexMapRenderer;
 import io.github.game.services.CharacterEntityService;
 import io.github.game.services.WorldEntityService;
+import io.github.game.settings.GameplaySettings;
 import io.github.game.utils.MemoryUtils;
 import javax.inject.Inject;
 
@@ -25,10 +27,13 @@ public class GameScreen implements Screen {
     private final WorldEntityService worldEntityService;
     private final HexMapRenderer hexMapRenderer;
 
+
     private final InputManager inputManager;
     private final Viewport viewport;
     private final CharacterEntityService characterEntityService;
     private final PerformanceMonitor performanceMonitor;
+
+    private final GameplaySettings gameplaySettings;
 
     @Inject
     public GameScreen(PooledEngine engine,
@@ -38,7 +43,7 @@ public class GameScreen implements Screen {
                       InputManager inputManager,
                       Viewport viewport,
                       CharacterEntityService characterEntityService,
-                      PerformanceMonitor performanceMonitor) {
+                      PerformanceMonitor performanceMonitor, GameplaySettings gameplaySettings) {
         this.engine = engine;
         this.entityFactory = entityFactory;
         this.worldEntityService = worldEntityService;
@@ -47,6 +52,7 @@ public class GameScreen implements Screen {
         this.viewport = viewport;
         this.characterEntityService = characterEntityService;
         this.performanceMonitor = performanceMonitor;
+        this.gameplaySettings = gameplaySettings;
     }
 
     @Override
@@ -54,13 +60,16 @@ public class GameScreen implements Screen {
         // Установка обработчика ввода
         Gdx.input.setInputProcessor(inputManager.getInputMultiplexer());
 
-
         // Создание игрока и NPC через отдельный сервис
         characterEntityService.createPlayer(100, 100);
 
         for (int i = 0; i < 10; i++) {
             characterEntityService.createNPC(random.nextInt(1000), random.nextInt(1000));
         }
+
+//        for (int i = 0; i < 100; i++) {
+//            worldEntityService.createRandomLocation();
+//        }
 
         MemoryUtils.logMemoryUsage("GameScreen shown");
     }
@@ -94,7 +103,7 @@ public class GameScreen implements Screen {
         performanceMonitor.render();
         performanceMonitor.endEvent("monitoring_render");
 
-        if (Gdx.graphics.getFrameId() % 60 == 0) {
+        if (Gdx.graphics.getFrameId() % 6000 == 0) {
             PerformanceLogger.logMemoryUsage("During rendering");
 
             if (MemoryUtils.isMemoryCritical()) {

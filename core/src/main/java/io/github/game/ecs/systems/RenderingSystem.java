@@ -42,7 +42,7 @@ public class RenderingSystem extends IteratingSystem {
 //        MemoryUtils.logMemoryUsage("RenderingSystem after update");
 
         // Логируем для отладки
-        if (Gdx.graphics.getFrameId() % 60 == 0) {
+        if (Gdx.graphics.getFrameId() % 6000 == 0) {
             Gdx.app.debug("RenderingSystem", "Rendered entities: " + getEntities().size());
         }
     }

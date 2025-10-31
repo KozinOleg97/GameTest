@@ -7,19 +7,17 @@ import static io.github.game.core.world.hex.HexType.MOUNTAINS;
 import static io.github.game.core.world.hex.HexType.OCEAN;
 import static io.github.game.core.world.hex.HexType.PLAINS;
 import static io.github.game.core.world.hex.HexType.SWAMP;
+import static io.github.game.core.world.hex.HexUtils.HEX_SIZE;
+import static io.github.game.core.world.hex.HexUtils.HEX_WIDTH;
+import static io.github.game.core.world.hex.HexUtils.Y_PITCH;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Matrix4;
 import io.github.game.core.world.HexMap;
-import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexType;
 import java.util.EnumMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -28,14 +26,11 @@ import javax.inject.Singleton;
 public class HexMapRenderer {
 
     // Константы для размера гекса
-    private static final float HEX_SIZE = 25f;
-    private static final float HEX_WIDTH = (float) (Math.sqrt(3) * HEX_SIZE);
-    private static final float HALF_WIDTH = HEX_WIDTH / 2;
-    private static final float HEX_HEIGHT = 2 * HEX_SIZE;
-    private static final float Y_PITCH = 1.5f * HEX_SIZE;
+
 
     // Статические данные для вершин единичного гекса (предварительно вычисленные)
-    private static final float[] UNIT_HEX_VERTICES = new float[2 * 8];
+    private static final float[] UNIT_HEX_VERTICES = new float[2 * 7];
+    static private final Color contourColor = new Color(0, 0, 0, 1);
 
     static {
         // Вычисляем вершины единичного гекса один раз при загрузке класса
@@ -45,14 +40,11 @@ public class HexMapRenderer {
             UNIT_HEX_VERTICES[i * 2] = HEX_SIZE * (float) Math.cos(angle);
             UNIT_HEX_VERTICES[i * 2 + 1] = HEX_SIZE * (float) Math.sin(angle);
         }
-        UNIT_HEX_VERTICES[14] = UNIT_HEX_VERTICES[0];
-        UNIT_HEX_VERTICES[15] = UNIT_HEX_VERTICES[1] - HEX_SIZE;
     }
 
     private final HexMap hexMap;
     private final ShapeRenderer shapeRenderer;
     private final OrthographicCamera camera;
-
     // цвета гексов
     private final Map<HexType, Color> hexColorsMap = new EnumMap<>(
         Map.of(PLAINS, new Color(0.4f, 0.8f, 0.2f, 1),    // Зеленый для равнин
@@ -63,25 +55,8 @@ public class HexMapRenderer {
                DESERT, new Color(0.95f, 0.9f, 0.11f, 1),   // Желтый для пустыни
                SWAMP, new Color(0.1f, 0.2f, 0.1f, 1)      // Темно-зеленый для болота
         ));
-
-    private final Color defaultColor = new Color(0.9f, 0.1f, 0.9f, 1);
-    static private final Color contourColor = new Color(0, 0, 0, 1);
-    static private final Color transparentColor = new Color(0, 0, 0, 0);
-
-    // кешированные floatBits для цветов
-    private final Map<HexType, Float> hexFloatBits = hexColorsMap
-        .entrySet().stream()
-        .collect(Collectors.toMap(
-            e -> e.getKey(),
-            e -> e.getValue().toFloatBits()
-        ));
-
-    private final float defaultFloatBits = defaultColor.toFloatBits();
-    private final float transparentFloatBits = transparentColor.toFloatBits();
-
-    private final Matrix4 combinedMatrix = new Matrix4();
-    private final LineRenderer lineRenderer;
-    private final HexRenderer hexRenderer;
+    private final HexGridOutlineRenderer lineRenderer;
+    private final HexGridTextureRenderer hexRenderer;
 
 
     @Inject
@@ -89,8 +64,8 @@ public class HexMapRenderer {
         this.hexMap = hexMap;
         this.shapeRenderer = shapeRenderer;
         this.camera = camera;
-        this.lineRenderer = new LineRenderer(10000, contourColor);
-        this.hexRenderer = new HexRenderer(10000);
+        this.lineRenderer = new HexGridOutlineRenderer(10000, contourColor, UNIT_HEX_VERTICES);
+        this.hexRenderer = new HexGridTextureRenderer(10000, hexColorsMap, UNIT_HEX_VERTICES);
     }
 
     /**
@@ -112,167 +87,15 @@ public class HexMapRenderer {
 
         // Вычисляем диапазон индексов гексов, которые могут быть видны
         // Более точный расчет с учетом смещения гексов
-        int minQ = Math.max(0, (int) (((left - HEX_WIDTH) / (HEX_WIDTH)) + 1.00f));   //лево
+        int minQ = Math.max(0, (int) ((left - HEX_WIDTH) / HEX_WIDTH + 1.0f));   //лево
         int maxQ = Math.min(hexMap.getWidth() - 1,
-                            (int) (((right + HEX_WIDTH) / (HEX_WIDTH)) - 0.5f));        //право
+                            (int) ((right + HEX_WIDTH) / HEX_WIDTH - 0.5f)); //право
 
-        int minR = Math.max(0, (int) (((bottom - HEX_SIZE) / Y_PITCH) + 1.0f));    //низ
-        int maxR = Math.min(hexMap.getHeight() - 1,
-                            (int) (((top + HEX_SIZE) / Y_PITCH) - 0.0f));          //верх
+        int minR = Math.max(0, (int) ((bottom - HEX_SIZE) / Y_PITCH + 1.0f));    //низ
+        int maxR = Math.min(hexMap.getHeight() - 1, (int) ((top + HEX_SIZE) / Y_PITCH)); //верх
 
-        // Счетчики для статистики
-        int filledHexCount = 0;
-        int lineHexCount = 0;
-
-        combinedMatrix.set(camera.combined);
-
-        HexRenderer hexRenderer = this.hexRenderer;
-        float[] buffer = hexRenderer.getVerticesBuffer();
-        int vertSize = hexRenderer.getVertexSize();
-        int endIndex = 0;
-        int verticeOverflowLimit = hexRenderer.getMaxVertices() - (5 + 4 * (maxQ - minQ + 1));
-
-        hexRenderer.begin(combinedMatrix, GL20.GL_TRIANGLE_STRIP);
-
-        float x, y;
-        float oddOffset = HALF_WIDTH * (minR & 1);
-
-        Hex hex = hexMap.getHex(minQ, minR);
-        HexType prevType = hex.getType();
-        float colorBits = hexFloatBits.get(prevType);
-
-        // Отрисовка заполненных гексов
-        for (int r = minR; r <= maxR; r++) {
-            if ( verticeOverflowLimit < endIndex ) {
-                hexRenderer.end(endIndex);
-                endIndex = 0;
-                hexRenderer.begin(combinedMatrix, GL20.GL_TRIANGLE_STRIP);
-            }
-            y = Y_PITCH * r;
-            x = HEX_WIDTH * minQ + oddOffset;
-
-            buffer[endIndex] = x + UNIT_HEX_VERTICES[10];
-            buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[11];
-            buffer[endIndex + 2] = transparentFloatBits;
-            buffer[endIndex + 3] = x + UNIT_HEX_VERTICES[10];
-            buffer[endIndex + 4] = y + UNIT_HEX_VERTICES[11];
-            buffer[endIndex + 5] = transparentFloatBits;
-            buffer[endIndex + 6] = x + UNIT_HEX_VERTICES[8];
-            buffer[endIndex + 7] = y + UNIT_HEX_VERTICES[9];
-            buffer[endIndex + 8] = transparentFloatBits;
-            endIndex += vertSize * 3;
-
-
-            Hex[] curRow = hexMap.getRowDirectAccess(r);
-//            Hex[][] curGrid = hexMap.getHexGrid();
-
-//            Iterator<Hex> rowIteratorUnsafe = hexMap.getRowIteratorUnsafe(r, minQ);
-
-            for (int q = minQ; q <= maxQ; q++) {
-                x = HEX_WIDTH * q + oddOffset;
-
-//                hex = hexMap.getHex(q, r);
-
-                hex = curRow[q];
-
-//                hex = curGrid[r][q];
-
-//                hex = rowIteratorUnsafe.next();
-
-
-
-                if (prevType != hex.getType()) {
-                    prevType = hex.getType();
-                    colorBits = hexFloatBits.get(prevType);
-                }
-
-                buffer[endIndex] = x + UNIT_HEX_VERTICES[0];
-                buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[1];
-                buffer[endIndex + 2] = colorBits;
-                buffer[endIndex + 3] = x + UNIT_HEX_VERTICES[6];
-                buffer[endIndex + 4] = y + UNIT_HEX_VERTICES[7];
-                buffer[endIndex + 5] = colorBits;
-                buffer[endIndex + 6] = x + UNIT_HEX_VERTICES[2];
-                buffer[endIndex + 7] = y + UNIT_HEX_VERTICES[3];
-                buffer[endIndex + 8] = colorBits;
-                buffer[endIndex + 9] = x + UNIT_HEX_VERTICES[4];
-                buffer[endIndex + 10] = y + UNIT_HEX_VERTICES[5];
-                buffer[endIndex + 11] = colorBits;
-                endIndex += vertSize * 4;
-
-                filledHexCount++;
-            }
-
-            buffer[endIndex + 0] = x + UNIT_HEX_VERTICES[6];
-            buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[7];
-            buffer[endIndex + 2] = colorBits;
-            buffer[endIndex + 3] = x + UNIT_HEX_VERTICES[6];
-            buffer[endIndex + 4] = y + UNIT_HEX_VERTICES[7];
-            buffer[endIndex + 5] = colorBits;
-            endIndex += vertSize * 2;
-
-            oddOffset = HALF_WIDTH - oddOffset;
-        }
-
-        hexRenderer.end(endIndex);
-
-        // Отрисовка контуров гексов
-        LineRenderer lineRenderer = this.lineRenderer;
-        buffer = lineRenderer.getVerticesBuffer();
-        vertSize = lineRenderer.getVertexSize();
-        endIndex = 0;
-        verticeOverflowLimit = lineRenderer.getMaxVertices() - (8 * (maxR - (minR & ~1) + 1));
-
-        lineRenderer.begin(combinedMatrix, GL20.GL_LINE_STRIP);
-
-        for (int q = minQ; q <= maxQ; q++) {
-            if ( verticeOverflowLimit < endIndex ) {
-                lineRenderer.end(endIndex);
-                endIndex = 0;
-                lineRenderer.begin(combinedMatrix, GL20.GL_LINE_STRIP);
-            }
-            x = HEX_WIDTH * q;
-            y = Y_PITCH * minR;
-
-            for (int r = minR & ~1; r <= maxR; r += 2) {
-                y = Y_PITCH * r;
-
-                for (int i = 12; i >= 6; i -= 2) {
-                    buffer[endIndex] = x + UNIT_HEX_VERTICES[i];
-                    buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[i + 1];
-                    endIndex += vertSize;
-                }
-            }
-
-            if ((maxR & 1) == 1)
-            {
-                buffer[endIndex] = x + UNIT_HEX_VERTICES[0];
-                buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[1] + 2 * Y_PITCH;
-                endIndex += vertSize;
-            }
-
-            for (int r = maxR & ~1; r >= minR - 1; r -= 2) {
-                y = Y_PITCH * r;
-
-                for (int i = 6; i >= 0; i -= 2) {
-                    buffer[endIndex] = x + UNIT_HEX_VERTICES[i];
-                    buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[i + 1];
-                    endIndex += vertSize;
-                }
-
-                lineHexCount++;
-            }
-
-            buffer[endIndex] = x + UNIT_HEX_VERTICES[2];
-            buffer[endIndex + 1] = y + UNIT_HEX_VERTICES[3];
-            endIndex += vertSize;
-        }
-
-        lineRenderer.end(endIndex);
-
-//        // Логируем количество отрисованных гексов
-//        Gdx.app.log("Rendered",
-//                    "Rendered filled hexes: " + filledHexCount + ", line hexes: " + lineHexCount);
+        hexRenderer.render(hexMap, camera.combined, minQ, maxQ, minR, maxR);
+        lineRenderer.render(hexMap, camera.combined, minQ, maxQ, minR, maxR);
     }
 
     /**
@@ -280,6 +103,8 @@ public class HexMapRenderer {
      */
     public void dispose() {
         shapeRenderer.dispose();
+        lineRenderer.dispose();
+        hexRenderer.dispose();
     }
 
 }

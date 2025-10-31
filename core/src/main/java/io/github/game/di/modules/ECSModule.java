@@ -11,6 +11,7 @@ import io.github.game.ecs.systems.MovementSystem;
 import io.github.game.ecs.systems.NPCLogicSystem;
 import io.github.game.ecs.systems.PlayerInputSystem;
 import io.github.game.ecs.systems.RenderingSystem;
+import io.github.game.ecs.systems.world.LocationRenderSystem;
 import io.github.game.services.InputService;
 import io.github.game.settings.CameraSettings;
 import io.github.game.settings.GameplaySettings;
@@ -61,7 +62,8 @@ public class ECSModule {
                                      NPCLogicSystem npcLogicSystem,
                                      CameraControlSystem cameraControlSystem,
 
-                                     RenderingSystem renderingSystem
+                                     RenderingSystem renderingSystem,
+                                     LocationRenderSystem locationRenderSystem
     ) {
         PooledEngine engine = new PooledEngine();
 
@@ -73,6 +75,7 @@ public class ECSModule {
         engine.addSystem(cameraControlSystem);
 
         engine.addSystem(renderingSystem);
+        engine.addSystem(locationRenderSystem);
 
         return engine;
     }
@@ -85,4 +88,13 @@ public class ECSModule {
                                                    CameraSettings cameraSettings) {
         return new CameraControlSystem(camera, inputService, graphicsSettings, cameraSettings);
     }
+
+
+    @Provides
+    @Singleton
+    LocationRenderSystem provideLocationRenderingSystem(SpriteBatch batch,
+                                                        OrthographicCamera camera) {
+        return new LocationRenderSystem(batch, camera);
+    }
+
 }
