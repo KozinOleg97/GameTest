@@ -1,10 +1,12 @@
 package io.github.game.services;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import io.github.game.core.world.generator.GenerationContext;
-import io.github.game.core.world.generator.GenerationManager;
+import io.github.game.core.world.generator.GeneratorFactory;
 import io.github.game.core.world.generator.GeneratorPipeline;
 import io.github.game.core.world.generator.GeneratorType;
+import io.github.game.core.world.generator.PipelineBuilder;
 import io.github.game.core.world.generator.location.LocationGeneratorConfig;
 import io.github.game.core.world.generator.world.WorldGeneratorConfig;
 import io.github.game.ecs.EntityFactory;
@@ -21,42 +23,42 @@ public class WorldEntityService {
 
     private final EntityFactory entityFactory;
 
-    private final GenerationManager generationManager;
-    private final GenerationContext generationContext;
 
+    private final GenerationContext generationContext;
+    private final GeneratorFactory generatorFactory;
 
     @Inject
     public WorldEntityService(PooledEngine engine, EntityFactory entityFactory,
-                              GenerationManager generationManager,
-                              GenerationContext generationContext) {
+                              GenerationContext generationContext, GeneratorFactory generatorFactory) {
         this.engine = engine;
         this.entityFactory = entityFactory;
-        this.generationManager = generationManager;
         this.generationContext = generationContext;
+        this.generatorFactory = generatorFactory;
     }
 
 
-    public GenerationContext generateAll() {
-        // Inject dependencies
-        GenerationManager manager = this.generationManager;
+    public void generateAll() {
         GenerationContext context = this.generationContext;
 
-        // Create pipeline: world -> locations
-        GeneratorPipeline pipeline = manager.
-            createStandardPipeline
-                (GeneratorType.PROCEDURAL_WORLD,
-                 new WorldGeneratorConfig(5050,
-                                          context.getSettings().getHexSize(),
-                                          context.getSettings().getHexSize()),
+        // Используем инжектированную фабрику
+        GeneratorPipeline pipeline = new PipelineBuilder(generatorFactory)
+            .withWorld(GeneratorType.PROCEDURAL_WORLD,
+                       new WorldGeneratorConfig(5050,
+                                                context.getSettings().getHexSize(),
+                                                context.getSettings().getHexSize()))
+            .withLocations(GeneratorType.RANDOM_LOCATION,
+                           new LocationGeneratorConfig(5050,
+                                                       context.getHexMap(),
+                                                       50))
+            .build();
 
-                 GeneratorType.RANDOM_LOCATION,
-                 new LocationGeneratorConfig(5050, context.getHexMap(), 20)
-                );
-        // Execute
+        GenerationContext resultContext = pipeline.execute(generationContext);
 
-//        HexMap map = result.getHexMap();
-//        List<Entity> locations = result.getLocations();
-        return pipeline.execute(context);
+        pipeline.clear();
+
+        for (Entity entity : resultContext.getLocations()) {
+            engine.addEntity(entity);
+        }
     }
 
 }

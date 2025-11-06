@@ -2,6 +2,7 @@ package io.github.game.core.world.generator.location;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import io.github.game.core.world.generator.GenerationContext;
 import java.util.List;
 
 /**
@@ -10,9 +11,11 @@ import java.util.List;
 public class SavedLocationGenerator implements LocationGenerator {
 
     private final String filePath;
+    private final GenerationContext context;
 
-    public SavedLocationGenerator(String filePath) {
+    public SavedLocationGenerator(String filePath, GenerationContext context) {
         this.filePath = filePath;
+        this.context = context;
     }
 
     @Override

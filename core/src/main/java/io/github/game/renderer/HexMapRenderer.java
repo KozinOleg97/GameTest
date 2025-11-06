@@ -21,7 +21,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Setter;
 
 
 @Singleton
@@ -58,14 +57,14 @@ public class HexMapRenderer {
         ));
     private final HexGridOutlineRenderer lineRenderer;
     private final HexGridTextureRenderer hexRenderer;
-
-    @Setter
-    private HexMap hexMap;
+    private GenerationContext context;
+    private final HexMap hexMap;
 
 
     @Inject
     public HexMapRenderer(GenerationContext context, ShapeRenderer shapeRenderer,
                           OrthographicCamera camera) {
+        this.context = context;
         this.hexMap = context.getHexMap();
         this.shapeRenderer = shapeRenderer;
         this.camera = camera;

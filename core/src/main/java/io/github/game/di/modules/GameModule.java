@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.core.world.generator.GenerationContext;
-import io.github.game.core.world.generator.GenerationManager;
+import io.github.game.core.world.generator.GeneratorFactory;
 import io.github.game.ecs.EntityFactory;
 import io.github.game.ecs.systems.CameraControlSystem;
 import io.github.game.ecs.systems.MovementSystem;
@@ -54,15 +54,10 @@ public class GameModule {
     @Singleton
     OrthographicCamera provideCamera(GraphicsSettings graphicsSettings) {
         OrthographicCamera camera = new OrthographicCamera();
-        camera.setToOrtho(false, graphicsSettings.getResolutionWidth(),
-                          graphicsSettings.getResolutionHeight());
+        camera.setToOrtho(false, graphicsSettings.getResolutionWidth(), graphicsSettings.getResolutionHeight());
 
         //TODO надо уточнить в какую точку ставить камеру
-        camera.position.set(
-            graphicsSettings.getResolutionWidth() / 2f,
-            graphicsSettings.getResolutionHeight() / 2f,
-            0
-        );
+        camera.position.set(graphicsSettings.getResolutionWidth() / 2f, graphicsSettings.getResolutionHeight() / 2f, 0);
         camera.update();
         return camera;
     }
@@ -72,16 +67,11 @@ public class GameModule {
     Viewport provideViewport(OrthographicCamera camera, GraphicsSettings graphicsSettings) {
         return switch (graphicsSettings.getViewportType()) {
             case GameSettingsConstants.VIEWPORT_TYPE_SCREEN -> new ScreenViewport(camera);
-            case GameSettingsConstants.VIEWPORT_TYPE_STRETCH -> new StretchViewport(
-                graphicsSettings.getResolutionWidth(),
-                graphicsSettings.getResolutionHeight(),
-                camera
-            );
-            default -> new FitViewport(
-                graphicsSettings.getResolutionWidth(),
-                graphicsSettings.getResolutionHeight(),
-                camera
-            );
+            case GameSettingsConstants.VIEWPORT_TYPE_STRETCH ->
+                new StretchViewport(graphicsSettings.getResolutionWidth(), graphicsSettings.getResolutionHeight(),
+                                    camera);
+            default ->
+                new FitViewport(graphicsSettings.getResolutionWidth(), graphicsSettings.getResolutionHeight(), camera);
         };
     }
 
@@ -93,13 +83,12 @@ public class GameModule {
         return shapeRenderer;
     }
 
-//    @Provides
-//    @Singleton
-//    HexMapRenderer provideHexMapRenderer(GenerationContext context,
-//                                         ShapeRenderer shapeRenderer,
-//                                         OrthographicCamera camera) {
-//        return new HexMapRenderer(context, shapeRenderer, camera);
-//    }
+    @Provides
+    @Singleton
+    HexMapRenderer provideHexMapRenderer(GenerationContext context, ShapeRenderer shapeRenderer,
+                                         OrthographicCamera camera) {
+        return new HexMapRenderer(context, shapeRenderer, camera);
+    }
 
     @Provides
     @Singleton
@@ -131,8 +120,7 @@ public class GameModule {
 
     @Provides
     @Singleton
-    InputManager provideInputManager(InputService inputService,
-                                     WorldMapInputProcessor worldMapProcessor,
+    InputManager provideInputManager(InputService inputService, WorldMapInputProcessor worldMapProcessor,
                                      BattleInputProcessor battleProcessor) {
         return new InputManager(inputService, worldMapProcessor, battleProcessor);
     }
@@ -142,11 +130,9 @@ public class GameModule {
     @Singleton
     PerformanceMonitor providePerformanceMonitor(GraphicsSettings graphicsSettings,
                                                  @Named("uiSpriteBatch") SpriteBatch uiSpriteBatch,
-                                                 @Named("uiViewport") Viewport uiViewport,
-                                                 BitmapFont font,
+                                                 @Named("uiViewport") Viewport uiViewport, BitmapFont font,
                                                  PooledEngine engine) {
-        return new PerformanceMonitor(graphicsSettings, uiSpriteBatch, uiViewport, font,
-                                      engine);
+        return new PerformanceMonitor(graphicsSettings, uiSpriteBatch, uiViewport, font, engine);
     }
 
     // From ServicesModule
@@ -164,12 +150,10 @@ public class GameModule {
 
     @Provides
     @Singleton
-    WorldEntityService provideWorldEntityService(PooledEngine engine,
-                                                 EntityFactory entityFactory,
-                                                 GenerationManager generationManager,
-                                                 GenerationContext generationContext
-    ) {
-        return new WorldEntityService(engine, entityFactory, generationManager, generationContext);
+    WorldEntityService provideWorldEntityService(PooledEngine engine, EntityFactory entityFactory,
+                                                 GenerationContext generationContext,
+                                                 GeneratorFactory generatorFactory) {
+        return new WorldEntityService(engine, entityFactory, generationContext, generatorFactory);
     }
 
     // From ECSModule
@@ -181,8 +165,7 @@ public class GameModule {
 
     @Provides
     @Singleton
-    PlayerInputSystem providePlayerInputSystem(InputService inputService,
-                                               GameplaySettings gameplaySettings) {
+    PlayerInputSystem providePlayerInputSystem(InputService inputService, GameplaySettings gameplaySettings) {
         return new PlayerInputSystem(inputService, gameplaySettings);
     }
 
@@ -206,13 +189,9 @@ public class GameModule {
 
     @Provides
     @Singleton
-    PooledEngine providePooledEngine(PlayerInputSystem playerInputSystem,
-                                     MovementSystem movementSystem,
-                                     NPCLogicSystem npcLogicSystem,
-                                     CameraControlSystem cameraControlSystem,
-                                     RenderingSystem renderingSystem,
-                                     LocationRenderSystem locationRenderSystem
-    ) {
+    PooledEngine providePooledEngine(PlayerInputSystem playerInputSystem, MovementSystem movementSystem,
+                                     NPCLogicSystem npcLogicSystem, CameraControlSystem cameraControlSystem,
+                                     RenderingSystem renderingSystem, LocationRenderSystem locationRenderSystem) {
         PooledEngine engine = new PooledEngine();
 
         // Важно: системы об��овления должны быть до системы рендеринга
@@ -228,17 +207,14 @@ public class GameModule {
 
     @Provides
     @Singleton
-    CameraControlSystem provideCameraControlSystem(OrthographicCamera camera,
-                                                   InputService inputService,
-                                                   GraphicsSettings graphicsSettings,
-                                                   CameraSettings cameraSettings) {
+    CameraControlSystem provideCameraControlSystem(OrthographicCamera camera, InputService inputService,
+                                                   GraphicsSettings graphicsSettings, CameraSettings cameraSettings) {
         return new CameraControlSystem(camera, inputService, graphicsSettings, cameraSettings);
     }
 
     @Provides
     @Singleton
-    LocationRenderSystem provideLocationRenderingSystem(SpriteBatch batch,
-                                                        OrthographicCamera camera) {
-        return new LocationRenderSystem(batch, camera);
+    LocationRenderSystem provideLocationRenderingSystem(SpriteBatch batch, OrthographicCamera camera, BitmapFont font) {
+        return new LocationRenderSystem(batch, camera, font);
     }
 }

@@ -11,6 +11,7 @@ import lombok.Setter;
 public class RenderComponent implements Component, Pool.Poolable {
 
     private Sprite sprite;
+    private String title;
 
     public RenderComponent() {
     }

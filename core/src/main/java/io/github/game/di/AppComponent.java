@@ -3,6 +3,7 @@ package io.github.game.di;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.Component;
 import io.github.game.MainGame;
+import io.github.game.core.world.generator.GenerationContext;
 import io.github.game.di.modules.CoreModule;
 import io.github.game.di.modules.GameModule;
 import io.github.game.di.modules.ScreenModule;
@@ -49,4 +50,6 @@ public interface AppComponent {
     AssetService assetService();
 
     LoadingScreen loadingScreen();
+
+    GenerationContext generationContext();
 }

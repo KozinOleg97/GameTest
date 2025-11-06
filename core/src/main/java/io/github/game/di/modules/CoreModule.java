@@ -2,8 +2,10 @@ package io.github.game.di.modules;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.MainGame;
@@ -39,11 +41,22 @@ public class CoreModule {
     @Provides
     @Singleton
     BitmapFont provideBitmapFont() {
-        // Создаем базовый шрифт
-        return new BitmapFont();
+        final String FONT_CHARS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
-        // Или загружаем из файла, если нужно:
-        // return new BitmapFont(Gdx.files.internal("fonts/myfont.fnt"));
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/GoodHeadPro-Light.ttf"));
+        FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+        parameter.size = 18;
+
+        parameter.color = Color.WHITE;
+        parameter.shadowColor = Color.BLACK;
+        parameter.shadowOffsetX = 1;
+        parameter.shadowOffsetY = 1;
+
+        parameter.characters = FONT_CHARS;
+        BitmapFont font12 = generator.generateFont(parameter);
+        generator.dispose();
+
+        return font12;
     }
 
 
@@ -52,7 +65,6 @@ public class CoreModule {
     Input provideInput() {
         return Gdx.input;
     }
-
 
 
     @Provides

@@ -1,5 +1,6 @@
 package io.github.game.core.world.hex;
 
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +20,7 @@ public class Hex {
     private int dangerLevel;
 
     @Setter
-    private String locationId;
+    private UUID locationId;
 
     @Setter
     private long generationSeed;

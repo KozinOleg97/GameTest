@@ -1,6 +1,7 @@
 package io.github.game.core.world.generator.world;
 
 import io.github.game.core.world.HexMap;
+import io.github.game.core.world.generator.GenerationContext;
 import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexType;
 
@@ -14,6 +15,7 @@ public class RectangularWorldGenerator implements WorldGenerator {
     private final int width;
     private final int height;
     private final HexType baseType;
+    private final GenerationContext context;
 
     /**
      * Создает генератор прямоугольной области
@@ -22,7 +24,8 @@ public class RectangularWorldGenerator implements WorldGenerator {
      * @param height высота области в гексах
      * @param seed
      */
-    public RectangularWorldGenerator(int width, int height, long seed) {
+    public RectangularWorldGenerator(int width, int height, long seed, GenerationContext context) {
+        this.context = context;
         this.startQ = 0;
         this.startR = 0;
         this.width = width;
@@ -37,7 +40,8 @@ public class RectangularWorldGenerator implements WorldGenerator {
      */
     @Override
     public HexMap generateWorld() {
-        HexMap map = new HexMap(width, height);
+        HexMap map = context.getHexMap();
+
         for (int q = startQ; q < startQ + width; q++) {
             for (int r = startR; r < startR + height; r++) {
                 // Создаем гекс и добавляем его на карту

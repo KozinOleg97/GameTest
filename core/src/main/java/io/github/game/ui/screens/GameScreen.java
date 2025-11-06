@@ -38,17 +38,11 @@ public class GameScreen implements Screen {
     private HexMapRenderer hexMapRenderer;
 
     @Inject
-    public GameScreen(PooledEngine engine,
-                      EntityFactory entityFactory,
-                      WorldEntityService worldEntityService,
-                      InputManager inputManager,
-                      Viewport viewport,
-                      CharacterEntityService characterEntityService,
-                      PerformanceMonitor performanceMonitor,
-                      GameplaySettings gameplaySettings,
-                      ShapeRenderer shapeRenderer,
-                      OrthographicCamera camera,
-                      GenerationContext generationContext) {
+    public GameScreen(PooledEngine engine, EntityFactory entityFactory, WorldEntityService worldEntityService,
+                      InputManager inputManager, Viewport viewport, CharacterEntityService characterEntityService,
+                      PerformanceMonitor performanceMonitor, GameplaySettings gameplaySettings,
+                      ShapeRenderer shapeRenderer, OrthographicCamera camera, GenerationContext generationContext,
+                      HexMapRenderer hexMapRenderer) {
         this.engine = engine;
         this.entityFactory = entityFactory;
         this.worldEntityService = worldEntityService;
@@ -60,6 +54,7 @@ public class GameScreen implements Screen {
         this.shapeRenderer = shapeRenderer;
         this.camera = camera;
         this.generationContext = generationContext;
+        this.hexMapRenderer = hexMapRenderer;
     }
 
     @Override
@@ -67,9 +62,7 @@ public class GameScreen implements Screen {
         // Установка обработчика ввода
         Gdx.input.setInputProcessor(inputManager.getInputMultiplexer());
 
-
-
-        this.hexMapRenderer = new HexMapRenderer(generationContext, shapeRenderer, camera);
+        worldEntityService.generateAll();
 
         // Создание игрока и NPC через отдельный сервис
         characterEntityService.createPlayer(100, 100);
@@ -110,7 +103,7 @@ public class GameScreen implements Screen {
         performanceMonitor.render();
         performanceMonitor.endEvent("monitoring_render");
 
-        if (Gdx.graphics.getFrameId() % 6000 == 0) {
+        if (Gdx.graphics.getFrameId() % 60000 == 0) {
             PerformanceLogger.logMemoryUsage("During rendering");
 
             if (MemoryUtils.isMemoryCritical()) {

@@ -66,7 +66,7 @@ public class HexGridTextureRenderer {
         float x, y;
         float oddOffset = HALF_WIDTH * (minR & 1);
 
-        Hex hex = map.getHex(minQ, minR);
+        Hex hex = map.getHex(minQ, minR); //TODO Index ** out of bounds for length ** при изменении размера окна
         HexType prevType = hex.getType();
         float colorBits = hexFloatBits.get(prevType);
 

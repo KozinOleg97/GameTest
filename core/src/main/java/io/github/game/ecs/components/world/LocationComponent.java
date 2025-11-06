@@ -14,6 +14,7 @@ import lombok.Setter;
 public class LocationComponent implements Component, Pool.Poolable {
 
     private UUID locationId;
+    private LocationData locationData;
 
 
     public LocationComponent() {

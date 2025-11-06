@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexCoordinates;
 import io.github.game.ecs.components.PositionComponent;
 import io.github.game.ecs.components.RenderComponent;
@@ -13,6 +14,7 @@ import io.github.game.ecs.components.tags.NPCComponent;
 import io.github.game.ecs.components.tags.PlayerComponent;
 import io.github.game.ecs.components.world.GlobalPositionComponent;
 import io.github.game.ecs.components.world.LocationComponent;
+import io.github.game.ecs.components.world.LocationData;
 import io.github.game.utils.ResourceManager;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -30,18 +32,53 @@ public class EntityFactory {
         this.resourceManager = resourceManager;
     }
 
+    public Entity createLocation(Hex hex, String type, String name, int size) {
+
+        Gdx.app.log("EntityFactory", "Creating location at  hex position: " + hex.getCoordinates().getR() + ", " +
+                                     hex.getCoordinates().getQ());
+
+        Entity location = engine.createEntity();
+
+        LocationComponent locationComponent = engine.createComponent(LocationComponent.class);
+        locationComponent.setLocationId(UUID.randomUUID());
+        locationComponent.setLocationData(new LocationData(name, (short) size, type));
+        location.add(locationComponent);
+
+        GlobalPositionComponent globalPositionComponent = engine.createComponent(GlobalPositionComponent.class);
+        globalPositionComponent.setCoordinates(hex.getCoordinates());
+        location.add(globalPositionComponent);
+
+        // Создаем и настраиваем спрайт
+        Texture playerTexture = resourceManager.getTexture("textures/ball.png");
+        if (playerTexture == null) {
+            throw new RuntimeException("Texture not found: textures/ball.png");
+        }
+
+        Sprite playerSprite = new Sprite(playerTexture);
+        playerSprite.setScale(0.5f * size);
+
+        RenderComponent render = engine.createComponent(RenderComponent.class);
+        render.setSprite(playerSprite);
+        render.setTitle(locationComponent.getLocationData().getName());
+        location.add(render);
+
+        Gdx.app.log("EntityFactory", "Location entity created successfully");
+
+        hex.setLocationId(locationComponent.getLocationId());
+
+        return location;
+    }
+
     public Entity createLocation(HexCoordinates coordinates) {
         Gdx.app.log("EntityFactory",
-                    "Creating location at  hex position: " + coordinates.getR() + ", " +
-                    coordinates.getQ());
+                    "Creating location at  hex position: " + coordinates.getR() + ", " + coordinates.getQ());
         Entity location = engine.createEntity();
 
         LocationComponent locationComponent = engine.createComponent(LocationComponent.class);
         locationComponent.setLocationId(UUID.randomUUID());
         location.add(locationComponent);
 
-        GlobalPositionComponent globalPositionComponent = engine.createComponent(
-            GlobalPositionComponent.class);
+        GlobalPositionComponent globalPositionComponent = engine.createComponent(GlobalPositionComponent.class);
         globalPositionComponent.setCoordinates(coordinates);
         location.add(globalPositionComponent);
 

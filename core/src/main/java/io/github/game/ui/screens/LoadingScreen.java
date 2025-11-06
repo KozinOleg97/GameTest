@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import io.github.game.core.world.generator.GenerationContext;
 import io.github.game.services.AssetService;
 import io.github.game.services.WorldEntityService;
 import javax.inject.Inject;
@@ -40,8 +39,6 @@ public class LoadingScreen implements Screen {
     public void show() {
         // Начинаем загрузку ресурсов при показе экрана
         assetService.loadAssets();
-
-        GenerationContext generationContext = worldEntityService.generateAll();
     }
 
     @Override
@@ -59,11 +56,11 @@ public class LoadingScreen implements Screen {
         // Отрисовка прогресса загрузки
         spriteBatch.begin();
         spriteBatch.setColor(Color.CORAL);
-        font.draw(spriteBatch, "Battle Screen - Not Implemented Yet", 100, 100);
+//        font.draw(spriteBatch, "Loading", 100, 100);
 
         font.draw(spriteBatch, "Loading: " + (int) (progress * 100) + "%",
-                  (float) Gdx.graphics.getWidth() / 2 - 50,
-                  (float) Gdx.graphics.getHeight() / 2);
+                  100,
+                  200);
         spriteBatch.end();
 
         // Если загрузка завершена, переключаемся на главный экран

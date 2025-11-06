@@ -107,8 +107,8 @@ public class ScreenFactoryImpl implements ScreenFactory {
             gameplaySettings,
             shapeRenderer,
             camera,
-            generationContext
-
+            generationContext,
+            hexMapRenderer
             );
     }
 

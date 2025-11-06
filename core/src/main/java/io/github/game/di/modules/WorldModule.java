@@ -3,8 +3,9 @@ package io.github.game.di.modules;
 import dagger.Module;
 import dagger.Provides;
 import io.github.game.core.world.generator.GenerationContext;
-import io.github.game.core.world.generator.GenerationManager;
 import io.github.game.core.world.generator.GeneratorFactory;
+import io.github.game.ecs.EntityFactory;
+import io.github.game.services.NameService;
 import io.github.game.settings.GameplaySettings;
 import javax.inject.Singleton;
 
@@ -16,19 +17,19 @@ public class WorldModule {
 
     @Provides
     @Singleton
-    GeneratorFactory provideGeneratorFactory() {
-        return new GeneratorFactory();
+    GeneratorFactory provideGeneratorFactory(GenerationContext context, EntityFactory entityFactory) {
+        return new GeneratorFactory(context, entityFactory);
     }
 
     @Provides
     @Singleton
-    GenerationManager provideGenerationManager(GeneratorFactory factory) {
-        return new GenerationManager(factory);
+    GenerationContext provideGenerationContext(GameplaySettings settings, NameService nameService) {
+        return new GenerationContext(settings, nameService);
     }
 
     @Provides
     @Singleton
-    GenerationContext provideGenerationContext(GameplaySettings settings) {
-        return new GenerationContext(settings);
+    NameService provideNameService() {
+        return new NameService();
     }
 }

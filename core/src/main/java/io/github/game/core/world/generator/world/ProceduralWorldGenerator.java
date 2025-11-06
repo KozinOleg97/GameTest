@@ -2,6 +2,7 @@ package io.github.game.core.world.generator.world;
 
 import com.badlogic.gdx.Gdx;
 import io.github.game.core.world.HexMap;
+import io.github.game.core.world.generator.GenerationContext;
 import io.github.game.core.world.hex.Hex;
 import io.github.game.core.world.hex.HexType;
 import java.util.Random;
@@ -11,13 +12,12 @@ import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 /**
- * Продвинутый генератор мира с использованием многоуровневого шума Перлина. Использует
- * комбинированный подход с континентальным и климатическим моделированием.
+ * Продвинутый генератор мира с использованием многоуровневого шума Перлина. Использует комбинированный подход с
+ * континентальным и климатическим моделированием.
  * <p>
- * ОСНОВНАЯ ЛОГИКА: 1. Генерация отдельных карт высот, влажности, температуры и аридности с помощью
- * шума Перлина. 2. Нормализация каждой карты в диапазон [0, 1] для согласованности. 3.
- * Комбинирование параметров для каждого гекса в функции determineHexType(). 4. Создание гексов и
- * сбор статистики генерации.
+ * ОСНОВНАЯ ЛОГИКА: 1. Генерация отдельных карт высот, влажности, температуры и аридности с помощью шума Перлина. 2.
+ * Нормализация каждой карты в диапазон [0, 1] для согласованности. 3. Комбинирование параметров для каждого гекса в
+ * функции determineHexType(). 4. Создание гексов и сбор статистики генерации.
  */
 public class ProceduralWorldGenerator implements WorldGenerator {
 
@@ -33,7 +33,9 @@ public class ProceduralWorldGenerator implements WorldGenerator {
     private final PerlinNoise moistureNoise;     // Распределение влажности
     private final PerlinNoise temperatureNoise;  // Распределение температуры
     private final PerlinNoise mountainNoise;     // Специфически для горных хребтов
-    private final PerlinNoise aridityNoise;      // Уровень засушливости
+    private final PerlinNoise aridityNoise;
+
+    private GenerationContext context;
 
     /**
      * Конструктор генератора мира
@@ -42,7 +44,8 @@ public class ProceduralWorldGenerator implements WorldGenerator {
      * @param height высота мира в гексах
      * @param seed   seed для генерации
      */
-    public ProceduralWorldGenerator(int width, int height, long seed) {
+    public ProceduralWorldGenerator(int width, int height, long seed, GenerationContext context) {
+        this.context = context;
         this.width = width;
         this.height = height;
         this.seed = seed;
@@ -59,7 +62,7 @@ public class ProceduralWorldGenerator implements WorldGenerator {
     @Override
     public HexMap generateWorld() {
         // Создаем карту с указанием размеров
-        HexMap map = new HexMap(width, height);
+        HexMap map = context.getHexMap();
 
         // Массивы для сбора статистики по типам гексов
         int[] typeCounts = new int[HexType.values().length];
@@ -82,8 +85,7 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         float[][] aridityMap = new float[width][height];
 
         // ПАРАЛЛЕЛЬНАЯ ГЕНЕРАЦИЯ КАРТ: увеличивает производительность на больших картах
-        IntStream.range(0, width)
-                 .parallel() // Использует многопоточность для ускорения
+        IntStream.range(0, width).parallel() // Использует многопоточность для ускорения
                  .forEach(q -> {
                      for (int r = 0; r < height; r++) {
                          // Нормализованные координаты позволяют масштабировать шум независимо от размера карты
@@ -106,15 +108,13 @@ public class ProceduralWorldGenerator implements WorldGenerator {
             CompletableFuture.runAsync(() -> normalizeMap(heightMap), executorService),
             CompletableFuture.runAsync(() -> normalizeMap(moistureMap), executorService),
             CompletableFuture.runAsync(() -> normalizeMap(temperatureMap), executorService),
-            CompletableFuture.runAsync(() -> normalizeMap(aridityMap), executorService)
-        };
+            CompletableFuture.runAsync(() -> normalizeMap(aridityMap), executorService)};
         CompletableFuture.allOf(futures).join(); // Ожидаем завершения всех задач
         executorService.shutdown();
 
         long duration = System.currentTimeMillis() - startTime;
 
-        Gdx.app.log("Custom", "Hex entities creation completed " +
-                              duration + " mils");
+        Gdx.app.log("Custom", "Hex entities creation completed " + duration + " mils");
 
         // ОСНОВНОЙ ЦИКЛ: создание гексов на основе нормализованных карт
         for (int q = 0; q < width; q++) {
@@ -138,8 +138,7 @@ public class ProceduralWorldGenerator implements WorldGenerator {
                 maxAridity = Math.max(maxAridity, aridityValue);
 
                 // КЛЮЧЕВАЯ ЛОГИКА: определение типа гекса по комбинации параметров
-                HexType type = determineHexType(heightValue, moistureValue, temperatureValue,
-                                                aridityValue);
+                HexType type = determineHexType(heightValue, moistureValue, temperatureValue, aridityValue);
 
                 // Статистика по типам
                 typeCounts[type.ordinal()]++;
@@ -148,15 +147,13 @@ public class ProceduralWorldGenerator implements WorldGenerator {
                 // дополнительно варьировать детали (растительность и т.д.)
                 Hex hex = new Hex(q, r, type);
                 hex.setGenerationSeed(
-                    (long) (heightValue * 1000 + moistureValue * 100 + temperatureValue * 10 +
-                            aridityValue * 1));
+                    (long) (heightValue * 1000 + moistureValue * 100 + temperatureValue * 10 + aridityValue * 1));
 
                 // Добавляем гекс на карту
                 try {
                     map.addHex(hex);
                 } catch (IllegalArgumentException e) {
-                    Gdx.app.error("Generation",
-                                  "Failed to add hex at (" + q + ", " + r + "): " + e.getMessage());
+                    Gdx.app.error("Generation", "Failed to add hex at (" + q + ", " + r + "): " + e.getMessage());
                 }
             }
         }
@@ -164,26 +161,23 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         // ВЫВОД СТАТИСТИКИ: полезно для балансировки и отладки
         Gdx.app.log("Generation", "World generation complete (%dx%d):".formatted(width, height));
         Gdx.app.log("Generation", "Height range: %.2f - %.2f".formatted(minHeight, maxHeight));
-        Gdx.app.log("Generation",
-                    "Moisture range: %.2f - %.2f".formatted(minMoisture, maxMoisture));
-        Gdx.app.log("Generation", "Temperature range: %.2f - %.2f".formatted(minTemperature,
-                                                                             maxTemperature));
+        Gdx.app.log("Generation", "Moisture range: %.2f - %.2f".formatted(minMoisture, maxMoisture));
+        Gdx.app.log("Generation", "Temperature range: %.2f - %.2f".formatted(minTemperature, maxTemperature));
         Gdx.app.log("Generation", "Aridity range: %.2f - %.2f".formatted(minAridity, maxAridity));
 
         // Распределение биомов в процентах
         for (HexType type : HexType.values()) {
             int count = typeCounts[type.ordinal()];
             double percentage = (double) count / totalCount * 100;
-            Gdx.app.log("Generation",
-                        "- %s: %d (%.1f%%)".formatted(type.getName(), count, percentage));
+            Gdx.app.log("Generation", "- %s: %d (%.1f%%)".formatted(type.getName(), count, percentage));
         }
 
         return map;
     }
 
     /**
-     * Нормализует карту для получения полного диапазона [0, 1] Это важно для согласованности
-     * пороговых значений в determineHexType
+     * Нормализует карту для получения полного диапазона [0, 1] Это важно для согласованности пороговых значений в
+     * determineHexType
      */
     private void normalizeMap(float[][] map) {
         float min = Float.MAX_VALUE;
@@ -209,12 +203,11 @@ public class ProceduralWorldGenerator implements WorldGenerator {
     }
 
     /**
-     * Генерирует значение высоты на основе шума Перлина. Ключевые особенности: - continentalNoise:
-     * задает базовые очертания континентов (крупные формы) - terrainNoise: добавляет детализацию
-     * рельефа (фрактальный шум) - mountainNoise: создает специфические горные хребты - plateNoise:
-     * очень низкочастотный шум для тектонических плит - mountainRidge: высокочастотный шум для
-     * острых горных пиков - Комбинирование с весами: основные формы + детали + горы - Возведение в
-     * степень (1.3): увеличивает контраст, подчеркивая долины и пики
+     * Генерирует значение высоты на основе шума Перлина. Ключевые особенности: - continentalNoise: задает базовые
+     * очертания континентов (крупные формы) - terrainNoise: добавляет детализацию рельефа (фрактальный шум) -
+     * mountainNoise: создает специфические горные хребты - plateNoise: очень низкочастотный шум для тектонических плит
+     * - mountainRidge: высокочастотный шум для острых горных пиков - Комбинирование с весами: основные формы + детали +
+     * горы - Возведение в степень (1.3): увеличивает контраст, подчеркивая долины и пики
      */
     private float generateHeightValue(float nx, float ny) {
         // Континентальный шум - определяет основные массы суши
@@ -222,9 +215,8 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         continentalValue = (continentalValue + 1.0f) / 2.0f;
 
         // Детализированный шум рельефа (фрактальный шум с октавами)
-        float terrainValue = terrainNoise.noise(nx * 4, ny * 4) * 0.5f
-                             + terrainNoise.noise(nx * 8, ny * 8) * 0.3f
-                             + terrainNoise.noise(nx * 16, ny * 16) * 0.2f;
+        float terrainValue = terrainNoise.noise(nx * 4, ny * 4) * 0.5f + terrainNoise.noise(nx * 8, ny * 8) * 0.3f +
+                             terrainNoise.noise(nx * 16, ny * 16) * 0.2f;
         terrainValue = (terrainValue + 1.0f) / 2.0f;
 
         // Горный шум - создает высокие горные области
@@ -241,8 +233,8 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         mountainRidge = (float) Math.pow(mountainRidge, 3); // Создать более выраженные хребты
 
         // Комбинируем все шумы с весовыми коэффициентами
-        float heightValue = continentalValue * 0.5f + terrainValue * 0.3f + mountainValue * 0.2f +
-                            plateNoise * 0.1f + mountainRidge * 0.15f;
+        float heightValue = continentalValue * 0.5f + terrainValue * 0.3f + mountainValue * 0.2f + plateNoise * 0.1f +
+                            mountainRidge * 0.15f;
 
         // Усиливаем контраст для создания более выраженного рельефа
         heightValue = (float) Math.pow(heightValue, 1.3f);
@@ -251,27 +243,25 @@ public class ProceduralWorldGenerator implements WorldGenerator {
     }
 
     /**
-     * Генерирует значение влажности. Использует фрактальный шум (октавы) для создания естественных
-     * паттернов осадков.
+     * Генерирует значение влажности. Использует фрактальный шум (октавы) для создания естественных паттернов осадков.
      */
     private float generateMoistureValue(float nx, float ny) {
         // Многоуровневый шум для влажности (фрактальный шум)
-        float noiseValue = moistureNoise.noise(nx * 3, ny * 3) * 0.6f
-                           + moistureNoise.noise(nx * 6, ny * 6) * 0.3f
-                           + moistureNoise.noise(nx * 12, ny * 12) * 0.1f;
+        float noiseValue = moistureNoise.noise(nx * 3, ny * 3) * 0.6f + moistureNoise.noise(nx * 6, ny * 6) * 0.3f +
+                           moistureNoise.noise(nx * 12, ny * 12) * 0.1f;
 
         return (noiseValue + 1.0f) / 2.0f;
     }
 
     /**
-     * Генерирует значение температуры. Особенности: - Фрактальный шум для базового распределения -
-     * Широтный градиент (latitudeEffect): температура падает к полюсам (ny = Y-координата) -
-     * Клиппинг значения: ограничение диапазона [0.1, 1.0]
+     * Генерирует значение температуры. Особенности: - Фрактальный шум для базового распределения - Широтный градиент
+     * (latitudeEffect): температура падает к полюсам (ny = Y-координата) - Клиппинг значения: ограничение диапазона
+     * [0.1, 1.0]
      */
     private float generateTemperatureValue(float nx, float ny) {
         // Многоуровневый шум для температуры
-        float noiseValue = temperatureNoise.noise(nx * 2, ny * 2) * 0.7f
-                           + temperatureNoise.noise(nx * 4, ny * 4) * 0.3f;
+        float noiseValue = temperatureNoise.noise(nx * 2, ny * 2) * 0.7f +
+                           temperatureNoise.noise(nx * 4, ny * 4) * 0.3f;
 
         // Нормализуем шум к диапазону [0, 1]
         noiseValue = (noiseValue + 1.0f) / 2.0f;
@@ -285,32 +275,27 @@ public class ProceduralWorldGenerator implements WorldGenerator {
     }
 
     /**
-     * Генерирует значение аридности (засушливости). Аридность может коррелировать с влажностью, но
-     * использует независимый шум для большего разнообразия биомов (например, высокогорные
-     * пустыни).
+     * Генерирует значение аридности (засушливости). Аридность может коррелировать с влажностью, но использует
+     * независимый шум для большего разнообразия биомов (например, высокогорные пустыни).
      */
     private float generateAridityValue(float nx, float ny) {
         // Многоуровневый шум для аридности
-        float noiseValue = aridityNoise.noise(nx * 2, ny * 2) * 0.7f
-                           + aridityNoise.noise(nx * 4, ny * 4) * 0.3f;
+        float noiseValue = aridityNoise.noise(nx * 2, ny * 2) * 0.7f + aridityNoise.noise(nx * 4, ny * 4) * 0.3f;
 
         return (noiseValue + 1.0f) / 2.0f;
     }
 
     /**
-     * Определяет тип гекса на основе высоты, влажности, температуры и аридности. Логика выстроена в
-     * виде каскада условий от самого определяющего фактора (высота) к более тонким (влажность,
-     * аридность).
+     * Определяет тип гекса на основе высоты, влажности, температуры и аридности. Логика выстроена в виде каскада
+     * условий от самого определяющего фактора (высота) к более тонким (влажность, аридность).
      * <p>
-     * ИЕРАРХИЯ ПРИНЯТИЯ РЕШЕНИЙ: 1. ВЫСОТА: вода/берег/суша 2. Для суши: высотные пояса
-     * (низменности, равнины, возвышенности, горы) 3. В каждом поясе: влажность и аридность
-     * определяют конкретный биом
+     * ИЕРАРХИЯ ПРИНЯТИЯ РЕШЕНИЙ: 1. ВЫСОТА: вода/берег/суша 2. Для суши: высотные пояса (низменности, равнины,
+     * возвышенности, горы) 3. В каждом поясе: влажность и аридность определяют конкретный биом
      * <p>
-     * Пороговые значения (0.4, 0.6 и т.д.) - ключевые параметры для балансировки мира. Их можно
-     * настраивать для изменения соотношения биомов.
+     * Пороговые значения (0.4, 0.6 и т.д.) - ключевые параметры для балансировки мира. Их можно настраивать для
+     * изменения соотношения биомов.
      */
-    private HexType determineHexType(float height, float moisture, float temperature,
-                                     float aridity) {
+    private HexType determineHexType(float height, float moisture, float temperature, float aridity) {
         // 1. Вода и береговая линия - самые определяющие факторы
         if (height < 0.4f) {
             return HexType.OCEAN;
@@ -364,11 +349,21 @@ public class ProceduralWorldGenerator implements WorldGenerator {
         }
     }
 
+    private float optimizePower(float value, float exponent) {
+        // Для целочисленных степеней используем умножение
+        if (exponent == 2) {
+            return value * value;
+        }
+        if (exponent == 3) {
+            return value * value * value;
+        }
+        return (float) Math.pow(value, exponent);
+    }
+
     /**
-     * Упрощенная реализация шума Перлина для процедурной генерации. Основные принципы: -
-     * permutation table: таблица псевдослучайных градиентов для воспроизводимости - fade-функция:
-     * сглаживает интерполяцию для естественного вида - grad-функция: вычисляет скалярное
-     * произведение для градиента - lerp: линейная интерполяция между значениями
+     * Упрощенная реализация шума Перлина для процедурной генерации. Основные принципы: - permutation table: таблица
+     * псевдослучайных градиентов для воспроизводимости - fade-функция: сглаживает интерполяцию для естественного вида -
+     * grad-функция: вычисляет скалярное произведение для градиента - lerp: линейная интерполяция между значениями
      * <p>
      * Это классическая реализация, хорошо подходящая для задач генерации ландшафта.
      */
@@ -412,10 +407,8 @@ public class ProceduralWorldGenerator implements WorldGenerator {
             int bb = permutation[b + 1];
 
             // Интерполируем между градиентами
-            return lerp(v, lerp(u, grad(permutation[aa], x, y),
-                                grad(permutation[ba], x - 1, y)),
-                        lerp(u, grad(permutation[ab], x, y - 1),
-                             grad(permutation[bb], x - 1, y - 1)));
+            return lerp(v, lerp(u, grad(permutation[aa], x, y), grad(permutation[ba], x - 1, y)),
+                        lerp(u, grad(permutation[ab], x, y - 1), grad(permutation[bb], x - 1, y - 1)));
         }
 
         /**
@@ -464,12 +457,5 @@ public class ProceduralWorldGenerator implements WorldGenerator {
             float v = h < 4 ? y : (h == 12 || h == 14 ? x : 0);
             return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
         }
-    }
-
-    private float optimizePower(float value, float exponent) {
-        // Для целочисленных степеней используем умножение
-        if (exponent == 2) return value * value;
-        if (exponent == 3) return value * value * value;
-        return (float) Math.pow(value, exponent);
     }
 }
